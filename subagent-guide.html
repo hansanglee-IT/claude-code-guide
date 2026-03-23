@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 2단계 — 나만의 AI 팀 만들기 | 한상</title>
+<meta name="description" content="서브 에이전트로 리서치팀, 기획팀, 법무팀, IR팀, 회계팀, 인사팀을 Claude Code 안에 만드는 방법. 스타트업 대표를 위한 고급 활용 가이드.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --s1: #111118;
+    --s2: #18181f;
+    --s3: #20202a;
+    --border: #26263a;
+    --border2: #32324a;
+    --text: #d8d8e8;
+    --text-mid: #8080a0;
+    --text-dim: #484860;
+    --white: #f0f0f8;
+    --v1: #6c63f5;
+    --v2: #3ecfca;
+    --v3: #f5a623;
+    --red: #f55a5a;
+    --green: #3ecf8e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.75; }
+
+  #prog { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--green),var(--v2)); z-index:200; transition:width .2s; }
+
+  #nav {
+    position:fixed; top:0; left:0; right:0;
+    background:rgba(9,9,15,.92); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:12px 40px; display:flex; align-items:center; justify-content:space-between;
+    z-index:100; transform:translateY(-100%); transition:transform .3s;
+  }
+  #nav.show { transform:translateY(0); }
+  .nav-brand { font-size:13px; font-weight:700; color:var(--white); }
+  .nav-back { font-size:11px; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:4px 12px; border-radius:5px; transition:all .15s; }
+  .nav-back:hover { color:var(--v2); border-color:var(--v2); }
+
+  /* HERO */
+  .hero {
+    min-height:80vh; display:flex; flex-direction:column;
+    justify-content:center; padding:100px 60px 80px;
+    position:relative; overflow:hidden; border-bottom:1px solid var(--border);
+  }
+  .hero::before {
+    content:''; position:absolute; top:-10%; right:-5%;
+    width:55%; height:75%;
+    background:radial-gradient(ellipse,rgba(62,207,142,.06) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .hero-inner { max-width:760px; position:relative; z-index:1; }
+
+  .series-nav {
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:28px; flex-wrap:wrap;
+  }
+  .series-item {
+    font-size:11px; font-weight:700; padding:4px 12px;
+    border-radius:20px; letter-spacing:.08em;
+  }
+  .series-item.done { background:rgba(108,99,245,.15); color:var(--v1); border:1px solid rgba(108,99,245,.25); }
+  .series-item.current { background:rgba(62,207,142,.15); color:var(--green); border:1px solid rgba(62,207,142,.3); }
+  .series-item.upcoming { background:var(--s2); color:var(--text-dim); border:1px solid var(--border); }
+  .series-arrow { color:var(--text-dim); font-size:12px; }
+
+  .hero h1 {
+    font-family:'Noto Serif KR',serif;
+    font-size:clamp(28px,5vw,50px); font-weight:900;
+    color:var(--white); line-height:1.2; margin-bottom:20px;
+  }
+  .hero h1 em { font-style:normal; color:var(--green); }
+
+  .hero-lead {
+    font-size:16px; color:var(--text-mid); max-width:560px;
+    line-height:1.85; margin-bottom:36px;
+  }
+
+  .prereq-box {
+    background:var(--s1); border:1px solid rgba(245,166,35,.25);
+    border-radius:10px; padding:16px 20px;
+    display:flex; gap:12px; align-items:flex-start;
+    font-size:13.5px; color:#e0c070; max-width:560px;
+    margin-bottom:32px;
+  }
+  .prereq-box a { color:var(--v2); text-decoration:none; }
+  .prereq-box a:hover { text-decoration:underline; }
+
+  /* SECTIONS */
+  .section { padding:72px 60px; border-bottom:1px solid var(--border); }
+  .section-inner { max-width:800px; margin:0 auto; }
+  .eyebrow { font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+  .section-h { font-size:clamp(20px,3vw,30px); font-weight:800; color:var(--white); line-height:1.3; margin-bottom:24px; }
+
+  /* CONCEPT COMPARE */
+  .concept-compare {
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px;
+  }
+  .concept-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:22px 24px;
+  }
+  .concept-card.highlight { border-color:rgba(62,207,142,.3); }
+  .concept-tag {
+    font-size:10px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .concept-card:not(.highlight) .concept-tag { color:var(--text-dim); }
+  .concept-card.highlight .concept-tag { color:var(--green); }
+  .concept-title { font-size:15px; font-weight:800; color:var(--white); margin-bottom:10px; }
+  .concept-desc { font-size:13.5px; color:var(--text-mid); line-height:1.75; }
+  .concept-example {
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
+    font-size:12.5px; color:var(--text-dim); line-height:1.6;
+  }
+  .concept-example strong { color:var(--v2); }
+
+  /* TEAM CARDS */
+  .team-grid { display:flex; flex-direction:column; gap:16px; }
+
+  .team-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:14px; overflow:hidden;
+  }
+  .team-card-header {
+    display:grid; grid-template-columns:auto 1fr auto;
+    align-items:center; gap:16px; padding:20px 24px;
+    border-bottom:1px solid var(--border); cursor:pointer;
+    transition:background .15s;
+  }
+  .team-card-header:hover { background:var(--s2); }
+
+  .team-icon {
+    width:44px; height:44px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; flex-shrink:0;
+  }
+  .team-card:nth-child(1) .team-icon { background:rgba(108,99,245,.15); }
+  .team-card:nth-child(2) .team-icon { background:rgba(62,207,202,.12); }
+  .team-card:nth-child(3) .team-icon { background:rgba(245,166,35,.12); }
+  .team-card:nth-child(4) .team-icon { background:rgba(245,90,90,.12); }
+  .team-card:nth-child(5) .team-icon { background:rgba(62,207,142,.12); }
+  .team-card:nth-child(6) .team-icon { background:rgba(180,120,255,.12); }
+  .team-card:nth-child(7) .team-icon { background:rgba(255,180,80,.12); }
+
+  .team-name { font-size:17px; font-weight:800; color:var(--white); margin-bottom:3px; }
+  .team-role { font-size:12.5px; color:var(--text-dim); }
+  .team-arrow { color:var(--text-dim); font-size:12px; transition:transform .2s; }
+  .team-card.open .team-arrow { transform:rotate(90deg); }
+
+  .team-body { padding:0 24px 24px; display:none; }
+  .team-card.open .team-body { display:block; }
+
+  .team-desc {
+    font-size:14px; color:var(--text-mid); line-height:1.8;
+    padding:16px 0 14px;
+  }
+
+  .invoke-box {
+    background:var(--s2); border-radius:8px; padding:12px 16px;
+    margin:10px 0; font-size:13px; color:var(--text-dim); line-height:1.7;
+  }
+  .invoke-box strong { color:var(--white); display:block; margin-bottom:6px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+
+  /* PROMPT */
+  .prompt-box { background:#060609; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:12px 0; }
+  .prompt-top {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; background:var(--s2); border-bottom:1px solid var(--border);
+  }
+  .prompt-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+  .copy-btn {
+    background:transparent; border:1px solid var(--border2);
+    color:var(--text-dim); font-size:11px; padding:3px 10px;
+    border-radius:4px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all .15s;
+  }
+  .copy-btn:hover { border-color:var(--v2); color:var(--v2); }
+  .copy-btn.copied { border-color:var(--v2); color:var(--v2); }
+  .prompt-code {
+    padding:14px 16px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; color:#a0aac8; line-height:1.85;
+    white-space:pre-wrap; word-break:break-word;
+  }
+
+  /* CALLOUT */
+  .callout { border-radius:8px; padding:12px 16px; margin:12px 0; font-size:13.5px; line-height:1.7; display:flex; gap:10px; }
+  .tip { background:rgba(62,207,202,.07); border:1px solid rgba(62,207,202,.18); color:#70d8d0; }
+  .warn { background:rgba(245,90,90,.07); border:1px solid rgba(245,90,90,.18); color:#e09090; }
+  .info { background:rgba(108,99,245,.07); border:1px solid rgba(108,99,245,.18); color:#a098f0; }
+  .note { background:rgba(245,166,35,.07); border:1px solid rgba(245,166,35,.18); color:#d4a843; }
+
+  /* SETUP STEPS */
+  .setup-steps { display:flex; flex-direction:column; gap:12px; }
+  .setup-step { background:var(--s1); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .step-toggle {
+    display:flex; align-items:center; gap:16px;
+    padding:18px 22px; cursor:pointer; transition:background .15s;
+  }
+  .step-toggle:hover { background:var(--s2); }
+  .step-badge {
+    width:32px; height:32px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:900; color:#fff; flex-shrink:0;
+  }
+  .setup-step:nth-child(1) .step-badge { background:var(--v1); }
+  .setup-step:nth-child(2) .step-badge { background:var(--v2); color:#0a1a18; }
+  .setup-step:nth-child(3) .step-badge { background:var(--v3); color:#1a0800; }
+  .setup-step:nth-child(4) .step-badge { background:var(--green); color:#0a1a10; }
+  .step-toggle-title { font-size:16px; font-weight:700; color:var(--white); flex:1; }
+  .step-toggle-time { font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; }
+  .step-arrow2 { color:var(--text-dim); transition:transform .2s; font-size:12px; }
+  .setup-step.open .step-arrow2 { transform:rotate(90deg); }
+  .step-body { padding:0 22px 22px; display:none; border-top:1px solid var(--border); }
+  .setup-step.open .step-body { display:block; }
+  .step-desc-text { font-size:14px; color:var(--text-mid); padding:14px 0 12px; line-height:1.8; }
+
+  /* AUTHOR */
+  .author-section { padding:64px 60px 80px; border-top:1px solid var(--border); }
+  .author-inner { max-width:560px; margin:0 auto; }
+  .author-name { font-size:20px; font-weight:900; color:var(--white); margin-bottom:4px; }
+  .author-role { font-size:13px; color:var(--text-dim); margin-bottom:16px; }
+  .author-desc { font-size:14px; color:var(--text-mid); line-height:1.85; }
+
+  @media(max-width:768px) {
+    .hero,.section,.author-section { padding-left:20px; padding-right:20px; }
+    .concept-compare { grid-template-columns:1fr; }
+    #nav { padding:12px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<nav id="nav">
+  <div class="nav-brand">Claude Code 가이드 — 2단계</div>
+  <a class="nav-back" href="index.html">← 1단계로</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="series-nav">
+      <span class="series-item done">1단계 기본 세팅</span>
+      <span class="series-arrow">→</span>
+      <span class="series-item current">2단계 AI 팀 구성</span>
+      <span class="series-arrow">→</span>
+      <span class="series-item upcoming">3단계 MCP 연동</span>
+    </div>
+    <h1>Claude Code 안에<br><em>나만의 팀</em>을<br>만드는 방법</h1>
+    <p class="hero-lead">
+      리서치팀, 기획팀, 법무팀, IR팀, 커뮤니케이션팀, 회계팀, 인사팀.<br>
+      서브 에이전트를 활용하면 역할을 가진 AI 팀원을 직접 만들 수 있습니다.
+    </p>
+    <div class="prereq-box">
+      <span>⚠️</span>
+      <div>
+        <strong style="display:block;margin-bottom:4px;color:#f0d080;">1단계 완료 후 진행하세요</strong>
+        CLAUDE.md와 Skills 세팅이 먼저입니다. 아직 안 하셨다면 <a href="index.html">1단계 가이드</a>부터 시작하세요.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 서브 에이전트란 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">개념 정리</div>
+    <div class="section-h">Skills와 서브 에이전트, 무엇이 다른가요?</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      1단계에서 만든 Skills는 훌륭한 도구입니다. 그런데 한 단계 더 나아가고 싶을 때가 있습니다.<br>
+      "도구를 쓰는 것"과 "담당자에게 맡기는 것"의 차이입니다.
+    </p>
+
+    <div class="concept-compare">
+      <div class="concept-card">
+        <div class="concept-tag">1단계 — Skills</div>
+        <div class="concept-title">도구</div>
+        <div class="concept-desc">내가 직접 "/research"를 입력하면 정해진 형식대로 작업합니다. 매뉴얼이 있는 도구를 내가 꺼내 쓰는 방식입니다.</div>
+        <div class="concept-example">
+          <strong>예시</strong>
+          /research → 리서치 보고서 형식으로 작성<br>
+          /prd → PRD 양식으로 작성
+        </div>
+      </div>
+      <div class="concept-card highlight">
+        <div class="concept-tag">2단계 — 서브 에이전트</div>
+        <div class="concept-title">역할을 가진 팀원</div>
+        <div class="concept-desc">리서치팀, 기획팀처럼 역할과 전문성을 가진 Claude입니다. 독립된 공간에서 작업하고 결과만 보고합니다.</div>
+        <div class="concept-example">
+          <strong>예시</strong>
+          @리서치팀 → 리서치 전문가로서 분석<br>
+          @기획팀 → 기획자 관점에서 PRD 작성
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span>💡</span>
+      <div>
+        <strong style="display:block;margin-bottom:4px;color:var(--white);">핵심 차이: 독립된 컨텍스트</strong>
+        서브 에이전트는 메인 대화창과 별도의 작업 공간에서 실행됩니다. 무거운 리서치나 복잡한 분석을 맡겨도 메인 대화가 복잡해지지 않습니다. 결과만 깔끔하게 받아볼 수 있습니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5개 AI 팀 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">팀 구성</div>
+    <div class="section-h">스타트업 대표를 위한 AI 팀 7개</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      각 팀을 클릭하면 역할 설명과 설치 프롬프트를 확인할 수 있습니다.<br>
+      회계팀과 인사팀은 대표가 가장 힘들어하는 영역입니다. 이 두 팀부터 먼저 설치해보세요.
+    </p>
+
+    <div class="team-grid">
+
+      <!-- 리서치팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">🔍</div>
+          <div>
+            <div class="team-name">리서치팀</div>
+            <div class="team-role">시장 분석 · 경쟁사 조사 · 트렌드 리포트</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            시장 조사, 경쟁사 분석, 업계 트렌드 파악을 전담합니다. 단순히 정보를 나열하는 것이 아니라 "우리 회사에 어떤 의미인가"까지 해석해서 보고합니다.
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @research-team 국내 SaaS 시장 주요 플레이어 비교해줘<br>
+            @research-team 최근 6개월 프롭테크 투자 트렌드 정리해줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 리서치팀 서브 에이전트를 만들어줘.\n파일명: research-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: research-team\ndescription: 시장 규모·경쟁사·트렌드·투자 동향 조사가 필요할 때 자동 호출. 키워드: 시장분석, 경쟁사비교, 리서치, 업계동향. @research-team으로 직접 호출 가능.\n---\n\n당신은 스타트업 대표를 위한 전문 리서치 담당자입니다.\n\n역할:\n- 시장 현황 및 규모 조사\n- 경쟁사 포지셔닝 분석\n- 업계 트렌드 및 투자 동향 파악\n- 주요 인사이트 도출\n\n아웃풋 형식:\n1. 핵심 인사이트 3가지 (가장 먼저)\n2. 시장 현황 표\n3. 경쟁 구도 분석\n4. 우리 회사 시사점\n\n규칙:\n- 수치는 반드시 출처 명시\n- 추측은 (추정) 표기\n- 국내 + 글로벌 시장 모두 커버\n- 결론은 항상 "대표가 내일 당장 쓸 수 있는 내용"으로\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 리서치팀 서브 에이전트를 만들어줘.
+파일명: research-team.md
+
+아래 내용으로 만들어줘:
+
+---
+name: research-team
+description: 시장 규모·경쟁사·트렌드·투자 동향 조사가 필요할 때 자동 호출. 키워드: 시장분석, 경쟁사비교, 리서치, 업계동향. @research-team으로 직접 호출 가능.
+---
+
+당신은 스타트업 대표를 위한 전문 리서치 담당자입니다.
+
+역할:
+- 시장 현황 및 규모 조사
+- 경쟁사 포지셔닝 분석
+- 업계 트렌드 및 투자 동향 파악
+- 주요 인사이트 도출
+
+아웃풋 형식:
+1. 핵심 인사이트 3가지 (가장 먼저)
+2. 시장 현황 표
+3. 경쟁 구도 분석
+4. 우리 회사 시사점
+
+규칙:
+- 수치는 반드시 출처 명시
+- 추측은 (추정) 표기
+- 국내 + 글로벌 시장 모두 커버
+- 결론은 항상 "대표가 내일 당장 쓸 수 있는 내용"으로
+---
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 기획팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">📋</div>
+          <div>
+            <div class="team-name">기획팀</div>
+            <div class="team-role">PRD 작성 · 기능 스펙 · 로드맵 정리</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            아이디어를 개발팀이 바로 실행할 수 있는 수준의 문서로 만들어줍니다. 비개발자 대표와 개발팀 사이의 커뮤니케이션 간극을 줄이는 역할입니다.
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @planning-team 입주민 앱 푸시알림 기능 PRD 써줘<br>
+            @planning-team Q2 로드맵 우선순위 정리해줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 기획팀 서브 에이전트를 만들어줘.\n파일명: planning-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: planning-team\ndescription: PRD 작성, 기능 스펙, 로드맵 우선순위 정리가 필요할 때 자동 호출. 키워드: PRD, 기획서, 기능명세, 스펙, 로드맵. @planning-team으로 직접 호출 가능.\n---\n\n당신은 스타트업의 프로덕트 기획 담당자입니다.\n\n역할:\n- 제품 요구사항 문서(PRD) 작성\n- 기능 스펙 구체화\n- 개발팀 전달용 문서 작성\n- 로드맵 우선순위 정리\n\n아웃풋 형식 (PRD 기준):\n1. 배경 및 목적\n2. 사용자 스토리\n3. 핵심 기능 (Must Have / Nice to Have / Out of Scope)\n4. 기술 고려사항\n5. 일정 및 마일스톤\n6. 미결 사항\n\n규칙:\n- 모호한 표현 금지 ("빠르게" → 구체적 수치로)\n- 우선순위 반드시 명시\n- 개발자가 "왜"를 이해할 수 있도록 배경 충분히 작성\n- 비개발자 대표의 아이디어를 개발자 언어로 번역\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 기획팀 서브 에이전트를 만들어줘.
+파일명: planning-team.md
+
+아래 내용으로 만들어줘:
+
+---
+name: planning-team
+description: PRD 작성, 기능 스펙, 로드맵 우선순위 정리가 필요할 때 자동 호출. 키워드: PRD, 기획서, 기능명세, 스펙, 로드맵. @planning-team으로 직접 호출 가능.
+---
+
+당신은 스타트업의 프로덕트 기획 담당자입니다.
+
+역할:
+- 제품 요구사항 문서(PRD) 작성
+- 기능 스펙 구체화
+- 개발팀 전달용 문서 작성
+- 로드맵 우선순위 정리
+
+아웃풋 형식 (PRD 기준):
+1. 배경 및 목적
+2. 사용자 스토리
+3. 핵심 기능 (Must Have / Nice to Have / Out of Scope)
+4. 기술 고려사항
+5. 일정 및 마일스톤
+6. 미결 사항
+
+규칙:
+- 모호한 표현 금지 ("빠르게" → 구체적 수치로)
+- 우선순위 반드시 명시
+- 개발자가 "왜"를 이해할 수 있도록 배경 충분히 작성
+- 비개발자 대표의 아이디어를 개발자 언어로 번역
+---
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 법무팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">⚖️</div>
+          <div>
+            <div class="team-name">법무팀</div>
+            <div class="team-role">계약서 검토 · 위험 조항 스크리닝</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            변호사에게 넘기기 전 사전 스크리닝을 담당합니다. 어디가 불리한지, 무엇을 협상할 수 있는지 빠르게 파악해서 변호사 미팅을 더 효율적으로 만들어줍니다.<br><br>
+            <span style="color:var(--red);font-size:13px;">⚠️ 법적 효력 판단은 반드시 변호사 확인이 필요합니다.</span>
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @legal-team [계약서 내용 붙여넣기]<br>
+            @legal-team 이 NDA에서 우리에게 불리한 조항 찾아줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 법무팀 서브 에이전트를 만들어줘.\n파일명: legal-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: legal-team\ndescription: 계약서 위험 조항 검토, 법무 사전 스크리닝이 필요할 때 자동 호출. 키워드: 계약서, NDA, MOU, 조항검토, 협상. @legal-team으로 직접 호출 가능.\n---\n\n당신은 스타트업을 위한 법무 사전 스크리닝 담당자입니다.\n\n중요 안내: 법적 효력 판단은 반드시 변호사에게 확인하세요.\n이 검토는 변호사 미팅 전 사전 준비를 위한 스크리닝입니다.\n\n역할:\n- 계약서 위험 조항 식별\n- 협상 가능한 조항 제안\n- 누락된 중요 조항 확인\n- 업계 관행과 다른 조항 표시\n\n아웃풋 형식:\n🔴 주의 조항 (즉시 확인 필요) - 조항명 / 내용 / 리스크 / 권장 대응\n🟡 협상 가능 조항 - 조항명 / 현재 내용 / 제안 수정안\n🟢 표준 조항 (무난) - 목록\n📌 누락된 조항 (추가 권장)\n종합 의견\n\n규칙:\n- 불리한 조항 우선 식별\n- 업계 관행과 다른 부분 표시\n- 법적 판단이 필요한 부분은 반드시 전문가 확인 명시\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 법무팀 서브 에이전트를 만들어줘.
+파일명: legal-team.md
+
+---
+name: legal-team
+description: 계약서 위험 조항 검토, 법무 사전 스크리닝이 필요할 때 자동 호출. 키워드: 계약서, NDA, MOU, 조항검토, 협상. @legal-team으로 직접 호출 가능.
+---
+
+당신은 스타트업을 위한 법무 사전 스크리닝 담당자입니다.
+
+중요 안내: 법적 효력 판단은 반드시 변호사에게 확인하세요.
+
+역할:
+- 계약서 위험 조항 식별
+- 협상 가능한 조항 제안
+- 누락된 중요 조항 확인
+
+아웃풋 형식:
+🔴 주의 조항 / 🟡 협상 가능 / 🟢 표준 조항 / 📌 누락 조항 / 종합 의견
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IR팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">📊</div>
+          <div>
+            <div class="team-name">IR팀</div>
+            <div class="team-role">투자자 문서 · IR 자료 · 업데이트 메일</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            투자자 커뮤니케이션 전담 팀입니다. 1-pager, IR 덱 개요, 투자자 업데이트 메일을 VC 심사역 관점에서 작성합니다. 작성 후 스스로 체크리스트로 검토까지 진행합니다.
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @ir-team 시리즈A 투자자 미팅용 1-pager 만들어줘<br>
+            @ir-team 이번 달 투자자 업데이트 메일 초안 써줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 IR팀 서브 에이전트를 만들어줘.\n파일명: ir-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: ir-team\ndescription: IR 자료, 투자자 문서, VC 미팅 준비, 투자자 업데이트가 필요할 때 자동 호출. 키워드: IR, 1-pager, 투자자, VC, 시리즈A. @ir-team으로 직접 호출 가능.\n---\n\n당신은 스타트업 투자자 커뮤니케이션 담당자입니다.\nVC 심사역 관점에서 문서를 작성합니다.\n\n역할:\n- IR 1-pager 작성\n- 투자자 업데이트 메일\n- 투자자 미팅 브리핑 자료\n- VC 질문 대응 준비\n\n아웃풋 형식 (1-pager 기준):\n1. Executive Summary (3줄)\n2. 핵심 지표 표 (TAM, MRR, 고객 수, 성장률)\n3. 문제 → 솔루션 → 차별점\n4. Why Now / Why Us\n5. 투자 요청 사항\n\nVC 자체 검토 체크리스트 (작성 후 반드시 실행):\n- 시장이 충분히 큰가? (TAM 근거 있나)\n- 왜 이 팀이어야 하는가?\n- 수익 모델이 명확한가?\n- 숫자에 근거가 있는가?\n\n규칙:\n- 데이터 중심, 근거 없는 주장 금지\n- 투자자가 10초 안에 이해할 수 있는 수준\n- 리스크를 숨기지 않기\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 IR팀 서브 에이전트를 만들어줘.
+파일명: ir-team.md
+
+---
+name: ir-team
+description: IR 자료, 투자자 문서, VC 미팅 준비, 투자자 업데이트가 필요할 때 자동 호출. 키워드: IR, 1-pager, 투자자, VC, 시리즈A. @ir-team으로 직접 호출 가능.
+---
+
+당신은 스타트업 투자자 커뮤니케이션 담당자입니다.
+
+아웃풋: Executive Summary → 핵심지표표 → 문제·솔루션·차별점 → Why Now/Us → 투자요청
+작성 후 VC 관점 자체검토 체크리스트 반드시 실행
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 총무팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">📬</div>
+          <div>
+            <div class="team-name">커뮤니케이션팀</div>
+            <div class="team-role">이메일 · 공지 · 파트너 소통</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            대외 커뮤니케이션 전담 팀입니다. 수신자 유형(투자자/파트너/고객/팀)에 따라 어조를 자동으로 조정하고, 제목 옵션과 본문 두 가지 버전을 동시에 제공합니다.
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @comm-team VC에게 미팅 요청 메일 써줘<br>
+            @comm-team 파트너사에 계약 갱신 제안 메일 써줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 커뮤니케이션팀 서브 에이전트를 만들어줘.\n파일명: comm-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: comm-team\ndescription: 비즈니스 이메일, 공지문, 파트너·고객 소통 문서가 필요할 때 자동 호출. 키워드: 이메일, 메일작성, 공지, 파트너소통. @comm-team으로 직접 호출 가능.\n---\n\n당신은 스타트업 대표의 커뮤니케이션 담당자입니다.\n\n역할:\n- 비즈니스 이메일 작성\n- 파트너·고객 소통 문서\n- 팀 내부 공지\n\n수신자별 어조 기준:\n- 투자자/VC: 격식체, 자신감, 데이터 중심, 300자 이내\n- 파트너사: 비즈니스, 협력적, 500자 이내\n- 고객: 친절하되 전문적, 400자 이내\n- 팀원: 직접적, 간결, 200자 이내\n\n아웃풋 형식:\n제목 옵션 3개 (직접적 / 관계 강조 / 행동 유도)\n본문 버전 A — 간결형\n본문 버전 B — 상세형\n\n규칙:\n- 핵심을 첫 문장에\n- 빈 마무리 문장 금지 ("언제든 연락주세요" 같은 형식적 마무리)\n- 과도한 경어 중복 금지\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 커뮤니케이션팀 서브 에이전트를 만들어줘.
+파일명: comm-team.md
+
+---
+name: comm-team
+description: 비즈니스 이메일, 공지문, 파트너 소통이 필요할 때 사용. @comm-team으로 호출.
+---
+
+수신자별 어조 자동 조정 (투자자/파트너/고객/팀원)
+아웃풋: 제목 3개 옵션 + 본문 간결형/상세형 2가지
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 회계팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">🧾</div>
+          <div>
+            <div class="team-name">회계팀</div>
+            <div class="team-role">지출/수입 분류 · 세금계산서 가이드 · 월별 손익 요약</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            스타트업 대표가 가장 힘들어하는 영역 중 하나입니다. 지출 분류, 세금계산서 발행 가이드, 월별 손익 요약 보고서를 담당합니다. 세무사에게 더 효율적으로 넘길 수 있도록 자료를 사전 정리합니다.<br><br>
+            <span style="color:var(--v3);font-size:13px;">⚠️ 세무·회계 판단은 반드시 세무사 확인이 필요합니다. 자료 정리와 초안 작성 용도로 활용하세요.</span>
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @finance-team 이번 달 지출 내역 분류해줘 [내역 붙여넣기]<br>
+            @finance-team 세금계산서 발행 절차 알려줘<br>
+            @finance-team 3월 손익 요약 보고서 만들어줘 [수입/지출 내역]<br>
+            @finance-team 세무사에게 넘길 이번 달 자료 체크리스트 만들어줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 회계팀 서브 에이전트를 만들어줘.\n파일명: finance-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: finance-team\ndescription: 지출/수입 분류, 세금계산서 발행, 월별 손익 보고서, 세무 자료 정리가 필요할 때 자동 호출. 키워드: 지출정리, 세금계산서, 손익, 세무, 회계. @finance-team으로 직접 호출 가능.\n---\n\n당신은 스타트업 회계·재무 담당자입니다.\n\n중요 안내: 세무·회계 판단은 반드시 세무사에게 확인하세요.\n이 작업은 자료 정리 및 초안 작성 용도입니다.\n\n역할 1 — 지출/수입 분류:\n입력된 내역을 아래 항목으로 자동 분류합니다.\n- 인건비 (급여, 4대보험, 퇴직금)\n- 운영비 (임차료, 통신비, 소모품)\n- 마케팅비 (광고비, 이벤트)\n- 외주비 (프리랜서, 용역)\n- 기타\n분류 후 표로 정리하고 합계 제공\n\n역할 2 — 세금계산서 발행 가이드:\n상황별 발행 절차 안내\n- 일반과세자 → 세금계산서\n- 간이과세자 → 영수증\n- 발행 기한, 필수 기재 사항, 수정 발행 방법\n- 홈택스 발행 단계별 안내\n세금 판단이 필요한 경우 "세무사 확인 필요" 표시\n\n역할 3 — 월별 손익 요약 보고서:\n1. 월 수입 합계 (매출 / 투자금 구분)\n2. 월 지출 합계 (항목별)\n3. 손익 (수입 - 지출)\n4. 전월 대비 변화\n5. 세무사 확인 필요 항목\n6. 다음 달 주의사항\n\n규칙:\n- 숫자는 반드시 원 단위, 천 단위 구분 표기 (예: 1,500,000원)\n- 매출과 투자금 반드시 구분\n- 세금 관련 판단 항목은 "⚠️ 세무사 확인 필요" 표시\n- 누락된 항목 있으면 질문 먼저\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 회계팀 서브 에이전트를 만들어줘.
+파일명: finance-team.md
+
+---
+name: finance-team
+description: 지출/수입 분류, 세금계산서 발행 가이드, 월별 손익 보고서, 세무 자료 준비. @finance-team으로 호출.
+---
+
+역할 1 — 지출/수입 분류: 인건비/운영비/마케팅비/외주비/기타로 자동 분류 후 표 정리
+역할 2 — 세금계산서 가이드: 상황별 발행 절차, 홈택스 단계별 안내, 판단 필요 항목은 세무사 확인 표시
+역할 3 — 월별 손익 보고서: 수입(매출/투자금 구분) + 지출 + 손익 + 전월 대비 + 주의사항
+
+숫자는 천 단위 구분, 매출과 투자금 반드시 구분
+세무 판단 항목은 ⚠️ 세무사 확인 필요 표시
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 인사팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">👥</div>
+          <div>
+            <div class="team-name">인사팀</div>
+            <div class="team-role">채용 공고 · 계약서 · 온보딩 · 급여대장 · 4대보험</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            채용 공고 작성부터 계약서 초안, 온보딩 체크리스트, 급여대장, 4대보험을 포함한 채용 체크리스트까지 스타트업 인사 전반을 담당합니다. 처음 직원을 채용할 때 "뭐가 필요한지 모른다"는 막막함을 해소해드립니다.<br><br>
+            <span style="color:var(--v3);font-size:13px;">⚠️ 근로계약·4대보험 관련 판단은 노무사 확인이 필요합니다. 초안 및 가이드 용도로 활용하세요.</span>
+          </div>
+          <div class="invoke-box">
+            <strong>호출 방법</strong>
+            @hr-team 백엔드 개발자 채용 공고 써줘<br>
+            @hr-team 신규 입사자 근로계약서 초안 만들어줘<br>
+            @hr-team 첫 직원 채용 시 4대보험 가입 체크리스트 만들어줘<br>
+            @hr-team 이번 달 급여대장 양식 만들어줘<br>
+            @hr-team 신규 입사자 온보딩 체크리스트 만들어줘
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 인사팀 서브 에이전트를 만들어줘.\n파일명: hr-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: hr-team\ndescription: 채용 공고, 근로계약서, 온보딩, 급여대장, 4대보험 가입 체크리스트가 필요할 때 자동 호출. 키워드: 채용, 계약서, 온보딩, 급여대장, 4대보험, 입사. @hr-team으로 직접 호출 가능.\n---\n\n당신은 스타트업 인사 담당자입니다.\n\n중요 안내: 근로계약·급여·4대보험 관련 판단은 노무사에게 확인하세요.\n이 작업은 초안 작성 및 가이드 제공 용도입니다.\n\n역할 1 — 채용 공고 작성:\n1. 포지션 한 줄 소개\n2. 주요 업무\n3. 자격 요건 (필수 / 우대)\n4. 우리 팀 소개\n5. 혜택 및 근무 환경\n6. 지원 방법\n스타트업 특성에 맞게, 후보자 관점에서 매력적으로 작성\n\n역할 2 — 근로계약서 초안:\n표준 근로계약서 기준으로 작성\n필수 기재사항: 업무 내용, 근무 장소, 근로 시간, 임금, 연차\n수습기간, 비밀유지, 경업금지 조항 옵션 포함\n반드시 "노무사/법무사 최종 검토 필요" 명시\n\n역할 3 — 채용 체크리스트 (4대보험 포함):\n입사 전: 서류 수집, 계약서 서명\n입사 당일: 4대보험 취득신고 (국민연금/건강보험/고용보험/산재보험)\n- 신고 기한: 입사일로부터 15일 이내\n- 신고 방법: EDI 또는 4대사회보험 정보연계센터\n입사 후: 급여 이체 계좌 확인, 온보딩 진행\n노무사 확인 필요 항목 별도 표시\n\n역할 4 — 급여대장 양식:\n항목: 성명 / 부서 / 기본급 / 초과수당 / 공제항목(4대보험, 소득세, 지방세) / 실수령액\n월별 정리 가능한 엑셀 붙여넣기용 형식으로 제공\n4대보험 요율 안내 (2026년 기준, 변동 가능하므로 확인 권고)\n\n역할 5 — 온보딩 체크리스트:\n행정: 계약서, 통장사본, 주민등록증 사본, 4대보험\n장비: 노트북, 계정 생성, 메신저\n업무: 주요 업무 안내, 팀원 소개, 첫 주 일정\n문화: 팀 규칙, 커뮤니케이션 방식\n\n규칙:\n- 법령 관련 판단은 "⚠️ 노무사 확인 필요" 표시\n- 최신 4대보험 요율 변동 가능성 명시\n- 스타트업 현실에 맞는 실용적인 내용\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 인사팀 서브 에이전트를 만들어줘.
+파일명: hr-team.md
+
+---
+name: hr-team
+description: 채용 공고, 근로계약서, 온보딩, 급여대장, 4대보험 체크리스트. @hr-team으로 호출.
+---
+
+역할 1 — 채용 공고: 포지션소개+업무+자격요건+팀소개+혜택+지원방법
+역할 2 — 근로계약서 초안: 표준 근로계약서 기준, 노무사 확인 명시
+역할 3 — 4대보험 채용 체크리스트: 입사 전/당일/후 순서, 취득신고 기한(15일) 안내
+역할 4 — 급여대장 양식: 기본급+수당+4대보험공제+소득세+실수령액
+역할 5 — 온보딩 체크리스트: 행정/장비/업무/문화
+
+노무사 확인 필요 항목은 ⚠️ 표시
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 설치 방법 -->
+<section class="section" id="setup">
+  <div class="section-inner">
+    <div class="eyebrow">설치 가이드</div>
+    <div class="section-h">전체 팀 한꺼번에 설치하기</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      팀을 하나씩 설치해도 되고, 아래 프롬프트로 한꺼번에 설치할 수도 있습니다.
+    </p>
+
+    <div class="setup-steps">
+
+      <div class="setup-step open">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">1</div>
+          <div class="step-toggle-title">agents 폴더 확인</div>
+          <div class="step-toggle-time">~2분</div>
+          <div class="step-arrow2">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">서브 에이전트는 Skills와 다른 폴더에 저장됩니다. 먼저 확인해보세요.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,'~/.claude/agents/ 폴더가 있는지 확인해줘.\n없으면 만들어주고, 있으면 현재 에이전트 목록 보여줘.')">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더가 있는지 확인해줘.
+없으면 만들어주고, 있으면 현재 에이전트 목록 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">2</div>
+          <div class="step-toggle-title">5개 팀 한꺼번에 설치</div>
+          <div class="step-toggle-time">~10분</div>
+          <div class="step-arrow2">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">아래 프롬프트 하나로 5개 팀을 모두 설치합니다. 업종만 바꿔서 붙여넣으세요.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">(업종)만 바꿔서 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 아래 7개 서브 에이전트를 만들어줘.\n내 업종: (업종)\n\n[1] research-team.md — 시장 리서치, 경쟁사 분석, 트렌드 조사\n[2] planning-team.md — PRD 작성, 기능 스펙, 로드맵 우선순위\n[3] legal-team.md — 계약서 사전 스크리닝 (법률 전문가 대체 아님 명시)\n[4] ir-team.md — 투자자 문서, IR 자료, 업데이트 메일\n[5] comm-team.md — 비즈니스 이메일, 파트너 소통, 수신자별 어조 자동조정\n[6] finance-team.md — 지출/수입 정리, 세무 자료 준비, 월별 손익 요약 (세무 판단은 세무사 확인 명시)\n[7] hr-team.md — 채용 공고, 면접 질문, 온보딩 체크리스트, 성과 평가 양식 (근로계약은 노무사 확인 명시)\n\n각 에이전트는 역할, 아웃풋 형식, 규칙을 포함해서 전문적으로 만들어줘.\n완료 후 전체 목록 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 아래 7개 서브 에이전트를 만들어줘.
+내 업종: (업종)
+
+[1] research-team  — 시장 리서치, 경쟁사 분석
+[2] planning-team  — PRD 작성, 기능 스펙
+[3] legal-team     — 계약서 사전 스크리닝
+[4] ir-team        — 투자자 문서, IR 자료
+[5] comm-team      — 비즈니스 이메일, 파트너 소통
+[6] finance-team   — 지출 정리, 세무 자료 준비
+[7] hr-team        — 채용, 면접, 온보딩, 평가
+
+각자 역할, 아웃풋 형식, 규칙 포함해서 전문적으로 만들어줘.
+완료 후 전체 목록 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">3</div>
+          <div class="step-toggle-title">첫 번째 팀 호출 테스트</div>
+          <div class="step-toggle-time">~5분</div>
+          <div class="step-arrow2">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">설치가 끝나면 리서치팀부터 테스트해보세요.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">실전 테스트</div>
+              <button class="copy-btn" onclick="cp(this,'@research-team 국내 (업종) 시장 현황과 주요 경쟁사 3개 비교해줘')">복사</button>
+            </div>
+            <div class="prompt-code">@research-team 국내 (업종) 시장 현황과 주요 경쟁사 3개 비교해줘</div>
+          </div>
+          <div class="callout tip">
+            <span>💡</span>
+            <div>에이전트가 인식되지 않는다면 — Claude Code에서 "@"를 입력하면 설치된 에이전트 목록이 자동완성으로 나타납니다. 목록에 없다면 ~/.claude/agents/ 경로를 확인하세요.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">4</div>
+          <div class="step-toggle-title">나만의 팀 추가하기</div>
+          <div class="step-toggle-time">상시</div>
+          <div class="step-arrow2">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">5개 팀 외에 내 업무에 맞는 팀을 직접 추가할 수 있습니다.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">새 팀 추가 — 역할만 설명하면 됨</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 새 에이전트를 만들어줘.\n\n이름: (팀 이름 — 예: finance-team)\n역할: (이 팀이 하는 일 설명)\n주로 쓸 상황: (언제 이 팀을 부를지)\n아웃풋 형식: (어떤 형식으로 결과를 줬으면 하는지)\n\n위 정보를 바탕으로 전문적인 에이전트 파일로 만들어줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 새 에이전트를 만들어줘.
+
+이름: (팀 이름 — 예: finance-team)
+역할: (이 팀이 하는 일 설명)
+주로 쓸 상황: (언제 이 팀을 부를지)
+아웃풋 형식: (어떤 형식으로 결과를 줬으면 하는지)
+
+위 정보를 바탕으로 전문적인 에이전트 파일로 만들어줘.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- tools 참고 설명 -->
+<section class="section" style="padding-top:48px;padding-bottom:48px;">
+  <div class="section-inner">
+    <div class="eyebrow">참고 — 고급 설정</div>
+    <div class="section-h" style="font-size:20px;">tools 필드 — 에이전트 권한 제한하기</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:20px;line-height:1.85;">
+      지금 설치한 에이전트들은 기본적으로 Claude Code가 가진 모든 도구를 쓸 수 있습니다. 처음에는 이게 더 편합니다.<br>
+      나중에 여러 팀원이 함께 쓰거나 더 엄격한 제어가 필요할 때 <code style="font-family:monospace;background:var(--s2);padding:2px 6px;border-radius:3px;color:var(--v2);">tools</code> 필드로 권한을 제한할 수 있습니다.
+    </p>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--white);">tools 필드 예시</div>
+      <div style="padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#a0aac8;line-height:2;">
+        <span style="color:var(--text-dim);"># 읽기만 가능 (파일 수정 불가)</span><br>
+        <span style="color:var(--v2);">tools: Read, Grep</span><br><br>
+        <span style="color:var(--text-dim);"># 읽기 + 웹 검색</span><br>
+        <span style="color:var(--v2);">tools: Read, WebSearch</span><br><br>
+        <span style="color:var(--text-dim);"># 읽기 + 쓰기 (파일 생성/수정 가능)</span><br>
+        <span style="color:var(--v2);">tools: Read, Write</span><br><br>
+        <span style="color:var(--text-dim);"># 제한 없음 (기본값)</span><br>
+        <span style="color:var(--text-dim);"># tools 필드를 아예 쓰지 않으면 모든 도구 사용 가능</span>
+      </div>
+    </div>
+
+    <div style="background:var(--s2);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-dim);line-height:1.75;border-left:3px solid var(--v3);">
+      <strong style="color:var(--text);display:block;margin-bottom:6px;">언제 tools 제한이 필요한가</strong>
+      혼자 쓸 때는 제한 없이 쓰는 게 편합니다. 팀원과 함께 공유하거나, 에이전트가 실수로 파일을 수정하는 게 걱정될 때 제한을 추가하세요. 법무팀처럼 "읽고 분석만" 해야 하는 에이전트에 <code style="font-family:monospace;background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--v2);">tools: Read</code>를 주는 식으로 활용하면 됩니다.
+    </div>
+  </div>
+</section>
+
+<!-- 다음 단계 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">다음 단계</div>
+    <div class="section-h">2단계를 마쳤다면</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--s1);border:1px solid rgba(62,207,142,.25);border-radius:12px;padding:22px 24px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px;">완료</div>
+        <div style="font-size:15px;font-weight:800;color:var(--white);margin-bottom:8px;">1단계 + 2단계</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:14px;">CLAUDE.md, Skills, 서브 에이전트까지 갖춘 상태입니다. Claude Code가 진짜 업무 파트너로 자리 잡기 시작합니다.</div>
+        <a href="index.html" style="display:inline-block;font-size:12px;font-weight:700;color:var(--green);border:1px solid rgba(62,207,142,.3);padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s;">← 1단계 다시 보기</a>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:22px 24px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">다음</div>
+        <div style="font-size:15px;font-weight:800;color:var(--white);margin-bottom:8px;">3단계 — MCP 연동</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.7;">Gmail, Notion, Slack 등 실제 쓰는 도구에 연결합니다. 작성 예정입니다.</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(108,99,245,.07);border:1px solid rgba(108,99,245,.18);border-radius:10px;padding:18px 22px;font-size:14px;color:#a098f0;line-height:1.8;">
+      <strong style="color:var(--white);display:block;margin-bottom:6px;">📌 업데이트 알림 받기</strong>
+      3단계 가이드가 나오면 링크드인에 올릴 예정입니다. 팔로우하거나 DM으로 알림 신청해두시면 됩니다.
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section class="author-section">
+  <div class="author-inner">
+    <div class="author-name">한상</div>
+    <div class="author-role">스타트업 대표이사</div>
+    <div class="author-desc">
+      스타트업 대표로 살다 보면 해야 할 일은 많고, 혼자 감당해야 하는 것도 많습니다.<br>
+      서브 에이전트를 설치하면서 "이제 팀이 생겼다"는 느낌이 처음으로 들었습니다.<br><br>
+      써보면서 더 좋은 방법을 발견하면 계속 업데이트할 생각입니다.<br>
+      질문이나 피드백은 링크드인 DM으로 편하게 연락 주세요.
+    </div>
+    <div style="margin-top:20px;display:inline-block;background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.2);color:var(--green);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 · 2026년 3월 · 계속 업데이트 중</div>
+  </div>
+</section>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('prog').style.width = (window.scrollY / h * 100) + '%';
+    nav.classList.toggle('show', window.scrollY > 300);
+  });
+
+  function toggleTeam(header) {
+    header.closest('.team-card').classList.toggle('open');
+  }
+
+  function toggleStep(btn) {
+    btn.closest('.setup-step').classList.toggle('open');
+  }
+
+  function cp(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '복사됨 ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+
+  // Open first step by default
+  document.querySelector('.setup-step').classList.add('open');
+</script>
+</body>
+</html>
