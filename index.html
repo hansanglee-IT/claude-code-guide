@@ -382,6 +382,7 @@
     <a class="nav-link" href="#concepts">핵심 개념</a>
     <a class="nav-link" href="#usecases">어디에 써볼까</a>
     <a class="nav-link" href="#setup">세팅하기</a>
+    <a class="nav-link" href="#output">결과 활용</a>
     <a class="nav-link" href="#commands">명령어</a>
     <a class="nav-link" href="#planmode">플랜 모드</a>
     <a class="nav-link" href="#resources">참고 자료</a>
@@ -939,6 +940,70 @@
         <div style="font-size:13px;color:var(--text-mid);">리서치팀, 기획팀, 회계팀, 인사팀 — 역할을 가진 서브 에이전트 7개 만들기</div>
       </div>
       <a href="subagent-guide.html" style="background:var(--green);color:#0a1a10;font-size:14px;font-weight:800;padding:12px 24px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:all .2s;">2단계 가이드 보기 →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── OUTPUT ─── -->
+<section class="section" id="output">
+  <div class="section-inner">
+    <div class="eyebrow">결과 활용</div>
+    <div class="section-h">결과물, 어떻게 저장하고 쓰나요?</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      /research, /prd 같은 명령어를 실행하면 결과가 대화창에 텍스트로 출력됩니다.<br>
+      자동으로 파일이 저장되지는 않습니다. 아래 방법 중 하나를 선택하세요.
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+
+      <div style="background:var(--s1);border:1px solid rgba(62,207,142,.25);border-radius:12px;padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(62,207,142,.15);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📁</div>
+          <div style="font-size:15px;font-weight:800;color:var(--white);">결과 나온 후 파일 저장 요청 — 가장 깔끔</div>
+        </div>
+        <div style="font-size:13.5px;color:var(--text-mid);line-height:1.8;margin-bottom:12px;">결과를 확인하고 마음에 들면 바로 저장을 요청합니다.</div>
+        <div class="prompt-box">
+          <div class="prompt-top">
+            <div class="prompt-label">결과 나온 후 바로 입력</div>
+            <button class="copy-btn" onclick="cp(this,'방금 결과를 바탕화면에 파일로 저장해줘.\n파일명: research-결과.md')">복사</button>
+          </div>
+          <div class="prompt-code">방금 결과를 바탕화면에 파일로 저장해줘.
+파일명: research-결과.md</div>
+        </div>
+      </div>
+
+      <div style="background:var(--s1);border:1px solid rgba(108,99,245,.2);border-radius:12px;padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(108,99,245,.15);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📋</div>
+          <div style="font-size:15px;font-weight:800;color:var(--white);">처음부터 저장 포함해서 요청</div>
+        </div>
+        <div style="font-size:13.5px;color:var(--text-mid);line-height:1.8;margin-bottom:12px;">명령어 실행 시 저장 위치를 함께 지정합니다.</div>
+        <div class="prompt-box">
+          <div class="prompt-top">
+            <div class="prompt-label">저장까지 한 번에</div>
+            <button class="copy-btn" onclick="cp(this,'/research 국내 (업종) 경쟁사 분석\n완료되면 결과를 ~/Desktop/research-(업종).md 파일로 저장해줘.')">복사</button>
+          </div>
+          <div class="prompt-code">/research 국내 (업종) 경쟁사 분석
+완료되면 결과를 ~/Desktop/research-(업종).md 파일로 저장해줘.</div>
+        </div>
+      </div>
+
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📝</div>
+          <div style="font-size:15px;font-weight:800;color:var(--white);">대화창에서 복사 후 붙여넣기</div>
+        </div>
+        <div style="font-size:13.5px;color:var(--text-mid);line-height:1.8;">결과를 드래그해서 복사한 뒤 노션, 구글 독스, 이메일 등에 바로 붙여넣습니다. 짧은 결과물이나 바로 공유할 때 유용합니다.</div>
+      </div>
+
+    </div>
+
+    <div style="background:var(--s2);border-radius:10px;padding:16px 20px;border-left:3px solid var(--v3);font-size:13.5px;color:var(--text-mid);line-height:1.8;">
+      <strong style="color:var(--white);display:block;margin-bottom:6px;">💡 폴더 하나 만들어두면 편합니다</strong>
+      바탕화면에 <code style="font-family:monospace;background:var(--s3);padding:1px 6px;border-radius:3px;color:var(--v2);">claude-outputs</code> 폴더를 하나 만들어두고 모든 결과물을 거기에 저장하는 습관을 들이면 나중에 찾기 편합니다.<br>
+      "~/Desktop/claude-outputs/ 폴더에 저장해줘"라고 하면 됩니다.
     </div>
 
   </div>
