@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>개발자 아닌 대표도 Claude Code를 써야 하는 이유 — 한상</title>
+<meta name="description" content="비개발자 스타트업 대표를 위한 Claude Code 실전 가이드. 왜 웹 Claude가 아닌 Claude Code인지, 어떤 업무가 달라지는지, 어떻게 세팅하는지.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --s1: #111118;
+    --s2: #18181f;
+    --s3: #20202a;
+    --border: #26263a;
+    --border2: #32324a;
+    --text: #d8d8e8;
+    --text-mid: #8080a0;
+    --text-dim: #484860;
+    --white: #f0f0f8;
+    --v1: #6c63f5;    /* 보라 */
+    --v2: #3ecfca;    /* 청록 */
+    --v3: #f5a623;    /* 앰버 */
+    --red: #f55a5a;
+    --green: #3ecf8e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.75; }
+
+  /* ─── PROGRESS ─── */
+  #prog { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--v1),var(--v2)); z-index:200; transition:width .2s; }
+
+  /* ─── NAV ─── */
+  #nav {
+    position:fixed; top:0; left:0; right:0;
+    background:rgba(9,9,15,.92); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:12px 40px;
+    display:flex; align-items:center; justify-content:space-between;
+    z-index:100; transform:translateY(-100%); transition:transform .3s;
+  }
+  #nav.show { transform:translateY(0); }
+  .nav-brand { font-size:13px; font-weight:700; color:var(--white); }
+  .nav-links { display:flex; gap:6px; }
+  .nav-link {
+    font-size:11px; padding:4px 10px; border-radius:5px;
+    background:var(--s2); border:1px solid var(--border);
+    color:var(--text-mid); cursor:pointer; text-decoration:none;
+    transition:all .15s;
+  }
+  .nav-link:hover { color:var(--v1); border-color:var(--v1); }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height:100vh; display:flex; flex-direction:column;
+    justify-content:center; padding:100px 60px 80px;
+    position:relative; overflow:hidden;
+    border-bottom:1px solid var(--border);
+  }
+  .hero::before {
+    content:''; position:absolute; top:-10%; left:-5%;
+    width:55%; height:75%;
+    background:radial-gradient(ellipse,rgba(108,99,245,.07) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .hero::after {
+    content:''; position:absolute; bottom:-15%; right:-5%;
+    width:45%; height:65%;
+    background:radial-gradient(ellipse,rgba(62,207,202,.05) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .hero-inner { max-width:760px; position:relative; z-index:1; }
+
+  .hero-kicker {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(108,99,245,.1); border:1px solid rgba(108,99,245,.22);
+    color:var(--v1); font-size:11px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    padding:5px 14px; border-radius:20px; margin-bottom:28px;
+  }
+
+  .hero h1 {
+    font-family:'Noto Serif KR',serif;
+    font-size:clamp(30px,5vw,52px); font-weight:900;
+    color:var(--white); line-height:1.2; margin-bottom:20px;
+  }
+  .hero h1 em { font-style:normal; color:var(--v1); }
+
+  .hero-lead {
+    font-size:17px; color:var(--text-mid); max-width:560px;
+    line-height:1.85; margin-bottom:40px;
+  }
+
+  /* ─── COMPARISON HOOK ─── */
+  .compare-row {
+    display:grid; grid-template-columns:1fr 1fr; gap:16px;
+    margin-bottom:40px; max-width:620px;
+  }
+  .compare-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:20px 22px;
+  }
+  .compare-card.bad { border-color:rgba(245,90,90,.2); }
+  .compare-card.good { border-color:rgba(62,207,202,.25); }
+  .compare-label {
+    font-size:10px; font-weight:700; letter-spacing:.12em;
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .compare-card.bad .compare-label { color:var(--red); }
+  .compare-card.good .compare-label { color:var(--v2); }
+  .compare-task {
+    font-size:13px; font-weight:700; color:var(--white); margin-bottom:6px;
+  }
+  .compare-time {
+    font-size:22px; font-weight:900; margin-bottom:4px;
+  }
+  .compare-card.bad .compare-time { color:var(--red); }
+  .compare-card.good .compare-time { color:var(--v2); }
+  .compare-desc { font-size:12px; color:var(--text-dim); }
+
+  .hero-cta { display:flex; gap:12px; flex-wrap:wrap; }
+  .btn-primary {
+    background:var(--v1); color:#fff; border:none;
+    padding:14px 28px; border-radius:10px; font-size:15px; font-weight:700;
+    cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+    text-decoration:none; display:inline-block; transition:all .2s;
+  }
+  .btn-primary:hover { background:#5a52d5; transform:translateY(-1px); }
+  .btn-ghost {
+    background:transparent; color:var(--text-mid);
+    border:1px solid var(--border2); padding:14px 28px;
+    border-radius:10px; font-size:15px; font-weight:600;
+    cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+    text-decoration:none; display:inline-block; transition:all .2s;
+  }
+  .btn-ghost:hover { border-color:var(--v1); color:var(--v1); }
+
+  /* ─── SECTION WRAPPER ─── */
+  .section {
+    padding:80px 60px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-inner { max-width:800px; margin:0 auto; }
+  .eyebrow {
+    font-size:10px; font-weight:700; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;
+  }
+  .section-h {
+    font-size:clamp(22px,3vw,32px); font-weight:800;
+    color:var(--white); line-height:1.3; margin-bottom:28px;
+  }
+
+  /* ─── WHY SECTION ─── */
+  .why-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:16px;
+    margin-bottom:24px;
+  }
+  .why-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:22px 24px;
+  }
+  .why-card-icon { font-size:24px; margin-bottom:12px; }
+  .why-card-title { font-size:15px; font-weight:700; color:var(--white); margin-bottom:8px; }
+  .why-card-desc { font-size:13.5px; color:var(--text-mid); line-height:1.75; }
+  .why-card-diff {
+    margin-top:12px; padding-top:12px;
+    border-top:1px solid var(--border);
+    font-size:12px; color:var(--text-dim); line-height:1.6;
+  }
+  .why-card-diff strong { color:var(--v2); font-weight:600; }
+
+  /* ─── QUOTE ─── */
+  .quote-block {
+    background:var(--s2); border:1px solid var(--border);
+    border-left:3px solid var(--v3); border-radius:0 10px 10px 0;
+    padding:20px 24px; margin:24px 0;
+  }
+  .quote-text {
+    font-size:15px; font-style:italic; color:var(--text); line-height:1.8;
+    margin-bottom:10px;
+  }
+  .quote-source { font-size:12px; color:var(--text-dim); }
+
+  /* ─── USE CASES ─── */
+  .usecase-list { display:flex; flex-direction:column; gap:16px; }
+
+  .usecase-item {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; overflow:hidden;
+    display:grid; grid-template-columns:3px 1fr;
+  }
+  .usecase-item:nth-child(1) { border-color:rgba(108,99,245,.25); }
+  .usecase-item:nth-child(1) .uc-bar { background:var(--v1); }
+  .usecase-item:nth-child(2) { border-color:rgba(62,207,202,.25); }
+  .usecase-item:nth-child(2) .uc-bar { background:var(--v2); }
+  .usecase-item:nth-child(3) { border-color:rgba(245,166,35,.25); }
+  .usecase-item:nth-child(3) .uc-bar { background:var(--v3); }
+  .usecase-item:nth-child(4) { border-color:rgba(245,90,90,.25); }
+  .usecase-item:nth-child(4) .uc-bar { background:var(--red); }
+  .usecase-item:nth-child(5) { border-color:rgba(62,207,142,.25); }
+  .usecase-item:nth-child(5) .uc-bar { background:var(--green); }
+
+  .uc-bar { width:3px; }
+
+  .uc-body { padding:20px 24px; }
+  .uc-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .uc-icon { font-size:20px; }
+  .uc-title { font-size:16px; font-weight:800; color:var(--white); }
+  .uc-desc { font-size:13.5px; color:var(--text-mid); line-height:1.75; margin-bottom:14px; }
+
+  .uc-before-after {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  .ba-block { background:var(--s2); border-radius:8px; padding:12px 14px; }
+  .ba-label {
+    font-size:10px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; margin-bottom:6px;
+  }
+  .ba-block.before .ba-label { color:var(--red); }
+  .ba-block.after .ba-label { color:var(--v2); }
+  .ba-content { font-size:13px; color:var(--text-mid); line-height:1.6; }
+  .ba-block.after .ba-content { color:var(--text); }
+
+  /* ─── VS TABLE ─── */
+  .vs-table {
+    width:100%; border-collapse:collapse;
+    border:1px solid var(--border); border-radius:10px;
+    overflow:hidden; font-size:13.5px;
+  }
+  .vs-table th {
+    padding:12px 16px; text-align:left;
+    font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--text-dim);
+    background:var(--s2); border-bottom:1px solid var(--border);
+  }
+  .vs-table td {
+    padding:12px 16px; border-bottom:1px solid rgba(38,38,58,.6);
+    color:var(--text-mid); vertical-align:top; line-height:1.6;
+  }
+  .vs-table tr:last-child td { border-bottom:none; }
+  .vs-table tr:hover td { background:var(--s2); }
+  .vs-table td:first-child { color:var(--text); font-weight:600; }
+  .badge-web {
+    display:inline-block; font-size:10px; padding:2px 7px;
+    border-radius:4px; background:var(--s3); color:var(--text-dim);
+    border:1px solid var(--border); font-weight:600;
+  }
+  .badge-code {
+    display:inline-block; font-size:10px; padding:2px 7px;
+    border-radius:4px; background:rgba(108,99,245,.12); color:var(--v1);
+    border:1px solid rgba(108,99,245,.2); font-weight:600;
+  }
+
+  /* ─── SETUP STEPS ─── */
+  .setup-steps { display:flex; flex-direction:column; gap:12px; }
+
+  .setup-step {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; overflow:hidden;
+  }
+
+  .step-toggle {
+    display:flex; align-items:center; gap:16px;
+    padding:18px 22px; cursor:pointer; transition:background .15s;
+  }
+  .step-toggle:hover { background:var(--s2); }
+
+  .step-badge {
+    width:32px; height:32px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:900; color:#fff; flex-shrink:0;
+  }
+  .setup-step:nth-child(1) .step-badge { background:var(--v1); }
+  .setup-step:nth-child(2) .step-badge { background:var(--v2); color:#0a1a18; }
+  .setup-step:nth-child(3) .step-badge { background:var(--v3); color:#1a0800; }
+  .setup-step:nth-child(4) .step-badge { background:var(--green); color:#0a1a10; }
+
+  .step-toggle-title { font-size:16px; font-weight:700; color:var(--white); flex:1; }
+  .step-toggle-time { font-size:12px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; }
+  .step-arrow { color:var(--text-dim); transition:transform .2s; font-size:12px; }
+  .setup-step.open .step-arrow { transform:rotate(90deg); }
+
+  .step-body {
+    padding:0 22px 20px; display:none;
+    border-top:1px solid var(--border);
+  }
+  .setup-step.open .step-body { display:block; }
+
+  .step-desc-text {
+    font-size:14px; color:var(--text-mid); padding:16px 0 12px; line-height:1.8;
+  }
+
+  /* ─── PROMPT ─── */
+  .prompt-box {
+    background:#060609; border:1px solid var(--border);
+    border-radius:8px; overflow:hidden; margin:10px 0;
+  }
+  .prompt-top {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; background:var(--s2); border-bottom:1px solid var(--border);
+  }
+  .prompt-label {
+    font-size:10px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--text-dim);
+    display:flex; align-items:center; gap:5px;
+  }
+  .prompt-label::before { content:'>_'; font-family:'JetBrains Mono',monospace; color:var(--v2); }
+  .copy-btn {
+    background:transparent; border:1px solid var(--border2);
+    color:var(--text-dim); font-size:11px; padding:3px 10px;
+    border-radius:4px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+    transition:all .15s;
+  }
+  .copy-btn:hover { border-color:var(--v2); color:var(--v2); }
+  .copy-btn.copied { border-color:var(--v2); color:var(--v2); }
+  .prompt-code {
+    padding:14px 16px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; color:#a0aac8; line-height:1.85;
+    white-space:pre-wrap; word-break:break-word;
+  }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    border-radius:8px; padding:12px 16px; margin:12px 0;
+    font-size:13.5px; line-height:1.7; display:flex; gap:10px;
+  }
+  .callout-icon { flex-shrink:0; }
+  .tip { background:rgba(62,207,202,.07); border:1px solid rgba(62,207,202,.18); color:#70d8d0; }
+  .warn { background:rgba(245,90,90,.07); border:1px solid rgba(245,90,90,.18); color:#e09090; }
+  .info { background:rgba(108,99,245,.07); border:1px solid rgba(108,99,245,.18); color:#a098f0; }
+
+  /* ─── SKILLS TABLE ─── */
+  .skills-table {
+    width:100%; border-collapse:collapse; font-size:13px;
+    margin:14px 0; border:1px solid var(--border);
+    border-radius:8px; overflow:hidden;
+  }
+  .skills-table th {
+    background:var(--s2); padding:10px 14px; text-align:left;
+    font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--text-dim);
+    border-bottom:1px solid var(--border);
+  }
+  .skills-table td {
+    padding:10px 14px; border-bottom:1px solid rgba(38,38,58,.5);
+    color:var(--text-mid); vertical-align:top;
+  }
+  .skills-table tr:last-child td { border-bottom:none; }
+  .skills-table tr:hover td { background:var(--s2); }
+  .skills-table td:first-child {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    color:var(--v2); font-weight:600; white-space:nowrap;
+  }
+
+  /* ─── AUTHOR ─── */
+  .author-section {
+    padding:64px 60px 80px; border-top:1px solid var(--border);
+  }
+  .author-inner { max-width:560px; margin:0 auto; }
+  .author-name { font-size:20px; font-weight:900; color:var(--white); margin-bottom:4px; }
+  .author-role { font-size:13px; color:var(--text-dim); margin-bottom:16px; }
+  .author-desc { font-size:14px; color:var(--text-mid); line-height:1.85; }
+
+  @media(max-width:768px){
+    .hero,.section,.author-section { padding-left:20px; padding-right:20px; }
+    .compare-row,.why-grid,.uc-before-after { grid-template-columns:1fr; }
+    #nav { padding:12px 20px; }
+    .nav-links { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<nav id="nav">
+  <div class="nav-brand">Claude Code 가이드 — 한상</div>
+  <div class="nav-links">
+    <a class="nav-link" href="#why">웹 Claude vs Claude Code</a>
+    <a class="nav-link" href="#usecases">어디에 써볼까</a>
+    <a class="nav-link" href="#concepts">핵심 개념</a>
+    <a class="nav-link" href="#setup">세팅하기</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker">스타트업 대표가 직접 쓰며 만든 가이드</div>
+    <h1>개발자 아닌 대표가<br><em>Claude Code</em>를<br>쓰기 시작한 이유</h1>
+    <p class="hero-lead">
+      웹 Claude로 되던 일이 있고, 안 되던 일이 있다.<br>
+      안 되던 걸 되게 해주는 게 Claude Code다. 개발 지식 없어도 된다.
+    </p>
+
+    <!-- 비포/애프터 훅 -->
+    <div class="compare-row">
+      <div class="compare-card bad">
+        <div class="compare-label">웹 Claude로 경쟁사 리서치</div>
+        <div class="compare-task">5개 경쟁사 분석</div>
+        <div class="compare-time">3~4시간</div>
+        <div class="compare-desc">탭 전환, 복붙 반복, 컨텍스트 초기화, 처음부터 다시</div>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">Claude Code /research로</div>
+        <div class="compare-task">5개 경쟁사 분석</div>
+        <div class="compare-time">20~30분</div>
+        <div class="compare-desc">명령어 하나, 파일로 저장, 검토까지 포함한 시간</div>
+      </div>
+    </div>
+
+    <div class="hero-cta">
+      <a class="btn-primary" href="#why">왜 다른지 보기 →</a>
+      <a class="btn-ghost" href="#setup">바로 세팅하기</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHY: 웹 Claude vs Claude Code ─── -->
+<section class="section" id="why">
+  <div class="section-inner">
+    <div class="eyebrow">핵심 차이</div>
+    <div class="section-h">왜 웹 Claude가 아닌 Claude Code인가</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      웹 Claude도 강력하다. 그런데 비개발자 대표가 실무에서 쓰다 보면 반드시 벽에 부딪힌다.<br>
+      Claude Code는 그 벽을 없앤 버전이다.
+    </p>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-card-icon">🧠</div>
+        <div class="why-card-title">기억 — 매번 설명 안 해도 된다</div>
+        <div class="why-card-desc">웹 Claude는 창을 닫으면 초기화된다. "나는 프롭테크 대표야, 한국어로 핵심만 말해줘"를 매번 반복해야 한다.</div>
+        <div class="why-card-diff">Claude Code는 <strong>CLAUDE.md</strong>에 나를 써두면 영구적으로 기억한다. 한 번만 세팅하면 끝.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-card-icon">💾</div>
+        <div class="why-card-title">저장 — 결과가 실제 파일로 남는다</div>
+        <div class="why-card-desc">웹 Claude에서 받은 리서치 결과, 기획서 초안 — 전부 대화창 안에 있다. 창 닫으면 찾기 어렵다.</div>
+        <div class="why-card-diff">Claude Code는 결과를 <strong>내 컴퓨터 파일로 자동 저장</strong>한다. 언제든 열 수 있다.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-card-icon">⚡</div>
+        <div class="why-card-title">명령어 — 반복 작업을 단어 하나로</div>
+        <div class="why-card-desc">매번 긴 프롬프트를 작성하거나, 이전 프롬프트를 찾아서 붙여넣는다. 시간도 낭비고 퀄리티도 들쭉날쭉하다.</div>
+        <div class="why-card-diff"><strong>/research, /investor, /prd</strong> — 단어 하나로 전문적인 형식의 문서가 나온다.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-card-icon">🔗</div>
+        <div class="why-card-title">한계 없음 — 긴 작업도 끊기지 않는다</div>
+        <div class="why-card-desc">웹 Claude는 대화가 길어지면 앞 내용을 잊기 시작한다. 복잡한 작업은 중간에 리셋해야 한다.</div>
+        <div class="why-card-diff">Claude Code는 <strong>로컬에서 실행</strong>되어 훨씬 긴 작업도 맥락을 유지한다.</div>
+      </div>
+    </div>
+
+    <div class="quote-block">
+      <div class="quote-text">"웹 Claude는 호텔 방이다 — 깔끔하고 세팅돼 있지만, 올 때마다 처음부터 시작한다. Claude Code는 AI가 있는 내 아파트다. 커스터마이즈하고, 쌓아가고, 함께 만들어나갈 수 있다."</div>
+      <div class="quote-source">— Dan Shipper, Every CEO (Claude Code 비개발자 활용 리서치)</div>
+    </div>
+
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th><span class="badge-web">웹 Claude</span></th>
+          <th><span class="badge-code">Claude Code</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>빠른 질문, 단순 초안</td>
+          <td>✅ 충분하다</td>
+          <td>굳이 안 써도 됨</td>
+        </tr>
+        <tr>
+          <td>반복하는 문서 작업</td>
+          <td>매번 처음부터</td>
+          <td>✅ /명령어 하나로 끝</td>
+        </tr>
+        <tr>
+          <td>경쟁사 5개 이상 리서치</td>
+          <td>컨텍스트 부족, 탭 전환 반복</td>
+          <td>✅ 한 번에 완성, 파일 저장</td>
+        </tr>
+        <tr>
+          <td>여러 문서 참고해서 작업</td>
+          <td>매번 복붙</td>
+          <td>✅ 내 파일 직접 읽음</td>
+        </tr>
+        <tr>
+          <td>Claude가 나를 기억하길 원할 때</td>
+          <td>매 세션 설명 반복</td>
+          <td>✅ CLAUDE.md로 영구 기억</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ─── USE CASES ─── -->
+<section class="section" id="usecases">
+  <div class="section-inner">
+    <div class="eyebrow">실전 활용</div>
+    <div class="section-h">스타트업 대표로서 Claude Code를 써볼 만한 5가지</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      개발자들의 코딩 도구가 아니다. 아래는 내가 직접 시간이 줄었다고 느낀 작업과,<br>비개발자들이 실제로 활용하고 있는 패턴을 정리한 것이다.
+    </p>
+
+    <div class="usecase-list">
+
+      <div class="usecase-item">
+        <div class="uc-bar"></div>
+        <div class="uc-body">
+          <div class="uc-header">
+            <div class="uc-icon">🔍</div>
+            <div class="uc-title">시장 리서치 — /research</div>
+          </div>
+          <div class="uc-desc">경쟁사 여러 개를 분석하고 포지셔닝 비교표를 만드는 작업. 웹 Claude에서는 탭 전환과 복붙을 반복하다 컨텍스트가 날아가는 일이 반복된다. Claude Code에서는 명령어 하나로 웹을 직접 탐색하고, 결과를 파일로 저장한다. 직접 써본 작업 중 체감 차이가 가장 컸다.</div>
+          <div class="uc-before-after">
+            <div class="ba-block before">
+              <div class="ba-label">기존 방식</div>
+              <div class="ba-content">웹 검색 → Claude에 복붙 → 결과 구글독 복붙 → 컨텍스트 초기화 → 처음부터<br>⏱ 2~4시간</div>
+            </div>
+            <div class="ba-block after">
+              <div class="ba-label">Claude Code</div>
+              <div class="ba-content">/research 국내 (업종) 경쟁사 비교<br>→ 인사이트 + 표 + 시사점 파일 저장<br>⏱ 20~30분 (검토 포함)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="usecase-item">
+        <div class="uc-bar"></div>
+        <div class="uc-body">
+          <div class="uc-header">
+            <div class="uc-icon">📊</div>
+            <div class="uc-title">투자자 문서 — /investor</div>
+          </div>
+          <div class="uc-desc">IR자료, 1-pager, 투자자 업데이트 메일. 매번 양식을 찾고, 지난 버전 어디 있었는지 뒤지고, 또 처음부터 설명하는 과정이 없어진다. 회사 정보만 입력하면 VC 관점의 자체 검토까지 포함된 문서가 나온다.</div>
+          <div class="uc-before-after">
+            <div class="ba-block before">
+              <div class="ba-label">기존 방식</div>
+              <div class="ba-content">지난 IR 찾기 → 수정 → Claude에 설명 → 초안 → 피드백 반영<br>⏱ 2~3시간</div>
+            </div>
+            <div class="ba-block after">
+              <div class="ba-label">Claude Code</div>
+              <div class="ba-content">/investor 시리즈A 1-pager<br>→ 회사 지표 입력 → VC 검토 포함 문서<br>⏱ 25분</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="usecase-item">
+        <div class="uc-bar"></div>
+        <div class="uc-body">
+          <div class="uc-header">
+            <div class="uc-icon">📋</div>
+            <div class="uc-title">PRD 작성 — /prd</div>
+          </div>
+          <div class="uc-desc">개발팀에게 넘길 제품 요구사항 문서. 비개발자 대표가 개발자 언어로 스펙을 정확하게 전달하는 게 가장 어렵다. 아이디어를 말로 설명하면 Claude가 개발팀이 바로 작업 가능한 수준의 PRD 초안을 만든다. 초안이 있고 없고의 차이가 크다 — 수정이 작성보다 훨씬 빠르기 때문이다.</div>
+          <div class="uc-before-after">
+            <div class="ba-block before">
+              <div class="ba-label">기존 방식</div>
+              <div class="ba-content">구두 설명 → 오해 → 수정 → 재설명<br>개발 착수 전 커뮤니케이션만 수일</div>
+            </div>
+            <div class="ba-block after">
+              <div class="ba-label">Claude Code</div>
+              <div class="ba-content">/prd 기능명 + 배경 한 줄<br>→ 사용자스토리·우선순위·미결사항 포함 문서<br>⏱ 30분</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="usecase-item">
+        <div class="uc-bar"></div>
+        <div class="uc-body">
+          <div class="uc-header">
+            <div class="uc-icon">✉️</div>
+            <div class="uc-title">비즈니스 이메일 — /email</div>
+          </div>
+          <div class="uc-desc">VC에게 미팅 요청, 파트너사에 제안, 팀에게 피드백. 수신자마다 어조가 달라야 하고, 짧고 명확해야 한다. Claude Code는 수신자 유형을 자동 파악해 제목 3개 옵션과 본문 2가지 버전을 동시에 준다.</div>
+          <div class="uc-before-after">
+            <div class="ba-block before">
+              <div class="ba-label">기존 방식</div>
+              <div class="ba-content">초안 작성 → Claude에 개선 요청 → 어조 수정 → 제목 고민<br>⏱ 20~40분</div>
+            </div>
+            <div class="ba-block after">
+              <div class="ba-label">Claude Code</div>
+              <div class="ba-content">/email VC 미팅 요청<br>→ 제목 3개 + 본문 2버전 즉시<br>⏱ 5분</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="usecase-item">
+        <div class="uc-bar"></div>
+        <div class="uc-body">
+          <div class="uc-header">
+            <div class="uc-icon">📄</div>
+            <div class="uc-title">계약서 사전 검토 — /contract</div>
+          </div>
+          <div class="uc-desc">변호사 검토 전 내가 먼저 훑어봐야 하는 계약서. 어디가 우리한테 불리한지, 뭘 협상할 수 있는지 파악하는 데 쓴다. 전체를 읽지 않아도 위험 조항이 어디 있는지 바로 나오기 때문에 변호사와의 대화 시간도 줄어든다. 법적 판단은 여전히 전문가의 몫이다 — Claude Code는 그 전 단계의 스크리닝 도구다.</div>
+          <div class="uc-before-after">
+            <div class="ba-block before">
+              <div class="ba-label">기존 방식</div>
+              <div class="ba-content">전체 읽기 → 뭐가 이상한지 모름 → 변호사에게 통째로 넘김<br>비용 + 시간 낭비</div>
+            </div>
+            <div class="ba-block after">
+              <div class="ba-label">Claude Code</div>
+              <div class="ba-content">/contract [계약서 붙여넣기]<br>→ 위험조항 🔴 / 협상가능 🟡 / 표준 🟢 분류<br>⏱ 10분</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONCEPTS ─── -->
+<section class="section" id="concepts">
+  <div class="section-inner">
+    <div class="eyebrow">핵심 개념</div>
+    <div class="section-h">Claude Code가 돌아가는 방식 — 4가지만 알면 된다</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:32px;line-height:1.85;">
+      설치하고 쓰기 전에, 이 4가지 개념만 잡아두면 나중에 막힐 때 스스로 해결할 수 있다.<br>
+      개발 지식 없이도 이해할 수 있는 수준으로 설명한다.
+    </p>
+
+    <!-- CONCEPT 1: CLAUDE.md -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--v1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🧠</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--v1);margin-bottom:3px;">항상 적용</div>
+          <div style="font-size:18px;font-weight:800;color:var(--white);">CLAUDE.md — Claude의 장기 기억</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px;">
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          Claude Code를 열 때마다 자동으로 읽는 파일이다. 여기에 "나는 DNK Labs 대표이사고, 항상 한국어로 핵심부터 말해줘"라고 써두면 매번 설명할 필요가 없다.
+        </p>
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          <strong style="color:var(--white);">무엇을 넣어야 하나:</strong> 나는 누구인가, 항상 지켜야 할 응답 원칙, 자주 하는 작업 목록. 단, 너무 많이 넣으면 오히려 효과가 줄어든다. 300단어 이내를 권장한다.
+        </p>
+        <div style="background:var(--s2);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-dim);border-left:3px solid var(--v1);">
+          <strong style="color:var(--text);display:block;margin-bottom:4px;">비유하자면</strong>
+          매일 아침 팀원에게 "오늘도 잘 부탁해, 나는 이런 사람이고 이렇게 일하는 걸 좋아해"라고 브리핑하는 것 vs. 그 팀원이 이미 나를 완전히 알고 있는 것의 차이다.
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 2: Skills -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--v2);color:#0a1a18;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⚡</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--v2);margin-bottom:3px;">필요할 때 호출</div>
+          <div style="font-size:18px;font-weight:800;color:var(--white);">Skills — 반복 작업의 명령어화</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px;">
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          <code style="font-family:monospace;background:var(--s2);padding:2px 7px;border-radius:4px;color:var(--v2);">/research</code>, <code style="font-family:monospace;background:var(--s2);padding:2px 7px;border-radius:4px;color:var(--v2);">/investor</code>, <code style="font-family:monospace;background:var(--s2);padding:2px 7px;border-radius:4px;color:var(--v2);">/prd</code> 같은 명령어를 직접 만드는 것이다. 각 명령어에는 "이 작업을 할 때 어떤 형식으로 어떻게 해줘"라는 지시문(SKILL.md)이 담겨 있다.
+        </p>
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          <strong style="color:var(--white);">CLAUDE.md와의 차이:</strong> CLAUDE.md는 항상 켜져 있는 규칙이고, Skills는 필요할 때만 불러오는 전문 도구다. 리서치할 때만 /research를 쓰는 것처럼. 공식 문서 기준으로 Skills는 <code style="font-family:monospace;background:var(--s2);padding:2px 7px;border-radius:4px;color:var(--v2);">~/.claude/skills/</code> 폴더 안에 폴더명/SKILL.md 구조로 저장된다.
+        </p>
+        <div style="background:var(--s2);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-dim);border-left:3px solid var(--v2);">
+          <strong style="color:var(--text);display:block;margin-bottom:4px;">실전 팁</strong>
+          같은 작업을 세 번 이상 반복하게 된다면 그게 Skills로 만들 신호다. 매번 프롬프트를 새로 쓰는 건 시간 낭비다.
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3: 작동 구조 -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--v3);color:#1a0800;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🔄</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--v3);margin-bottom:3px;">작동 방식</div>
+          <div style="font-size:18px;font-weight:800;color:var(--white);">Claude Code가 실제로 하는 일</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px;">
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          Claude Code는 내 컴퓨터에서 직접 실행된다. 파일을 읽고, 쓰고, 저장하고, 인터넷을 탐색한다. 웹 Claude가 대화창 안에서만 존재하는 것과 다르다.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div style="background:var(--s2);border-radius:8px;padding:14px 16px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:8px;">웹 Claude</div>
+            <div style="font-size:13px;color:var(--text-mid);line-height:1.6;">
+              대화창 안에서만 존재<br>
+              창 닫으면 사라짐<br>
+              파일 저장 불가<br>
+              매 세션 처음부터
+            </div>
+          </div>
+          <div style="background:var(--s2);border-radius:8px;padding:14px 16px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--v2);margin-bottom:8px;">Claude Code</div>
+            <div style="font-size:13px;color:var(--text-mid);line-height:1.6;">
+              내 컴퓨터에서 실행<br>
+              결과를 파일로 저장<br>
+              CLAUDE.md로 나를 기억<br>
+              긴 작업도 맥락 유지
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--s2);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-dim);border-left:3px solid var(--v3);">
+          <strong style="color:var(--text);display:block;margin-bottom:4px;">세션 시작 순서</strong>
+          Claude Code 실행 → CLAUDE.md 자동 읽기 → Skills 목록 파악 → 내 질문/명령 처리. 이 순서가 매번 반복된다.
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 4: Subagent -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--green);color:#0a1a10;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🤖</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:3px;">고급 활용 — 별도 가이드</div>
+          <div style="font-size:18px;font-weight:800;color:var(--white);">서브 에이전트 — 분리된 작업자</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px;">
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          서브 에이전트는 메인 Claude와 별도로 독립적인 컨텍스트(작업 공간)에서 일하는 Claude다. 무거운 작업을 분리해서 맡기고 결과만 받아온다.
+        </p>
+        <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+          예를 들어 "/research를 실행하면 서브 에이전트가 웹을 탐색하고 리서치를 마친 뒤 결과만 메인 대화창으로 돌려준다"는 식이다. 내 메인 대화창이 복잡해지지 않는다.
+        </p>
+        <div style="background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.18);border-radius:8px;padding:14px 18px;font-size:13px;color:#70d8a0;display:flex;gap:10px;">
+          <span style="flex-shrink:0;">📌</span>
+          <div>서브 에이전트 활용은 기본 세팅을 충분히 써본 이후 단계다. 지금 가이드에서는 개념만 잡아두고, 상세 활용법은 별도 페이지에서 다룬다.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── SETUP ─── -->
+<section class="section" id="setup">
+  <div class="section-inner">
+    <div class="eyebrow">세팅 가이드</div>
+    <div class="section-h">4단계로 완성 — 처음이라도 반나절이면 충분하다</div>
+
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      개발 지식 없어도 됩니다. 모든 프롬프트는 복붙만 하면 작동합니다.<br>
+      단계를 클릭해서 펼치세요.
+    </p>
+
+    <div class="setup-steps">
+
+      <!-- STEP 1 -->
+      <div class="setup-step open">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">1</div>
+          <div class="step-toggle-title">설치 — VS Code + Claude Code 확장</div>
+          <div class="step-toggle-time">~10분</div>
+          <div class="step-arrow">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">
+            터미널(검은 화면)이 익숙하지 않다면 <strong>VS Code 확장 방식이 훨씬 편하다.</strong><br>
+            VS Code는 파일 탐색기처럼 생긴 코드 편집기인데, Claude Code를 사이드바에서 채팅하듯 쓸 수 있다. Anthropic 공식 권장 방식이다.
+          </div>
+
+          <div style="margin:16px 0 8px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);">① VS Code 설치 (이미 있으면 건너뜀)</div>
+          <div class="callout info">
+            <div class="callout-icon">🔗</div>
+            <div><strong>code.visualstudio.com</strong> 접속 → Download → 설치. Windows/Mac 모두 동일.</div>
+          </div>
+
+          <div style="margin:16px 0 8px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);">② Claude Code 확장 설치</div>
+          <div class="callout info">
+            <div class="callout-icon">🔍</div>
+            <div>VS Code 실행 → 왼쪽 사이드바 Extensions 아이콘(네모 4개) 클릭 → 검색창에 <strong>"Claude Code"</strong> 입력 → Anthropic이 만든 공식 확장 → Install</div>
+          </div>
+
+          <div style="margin:16px 0 8px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);">③ Claude 로그인</div>
+          <div class="callout info">
+            <div class="callout-icon">🔑</div>
+            <div>설치 후 왼쪽 사이드바에 ✦ (스파크) 아이콘 클릭 → Claude 계정으로 로그인 → 완료.<br>계정 없으면 claude.ai에서 무료 가입 후 Pro 플랜($20/월) 필요.</div>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout-icon">💡</div>
+            <div>확장이 안 보이면 VS Code를 재시작하거나, Cmd+Shift+P(Mac) / Ctrl+Shift+P(Windows) → "Developer: Reload Window" 실행.</div>
+          </div>
+
+          <div style="margin:16px 0 8px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);">④ 세팅 상태 확인 — 첫 번째 입력</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">VS Code 사이드바 Claude 채팅창에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,'내 Claude Code 상태를 확인해줘.\n.claude 폴더가 있는지, CLAUDE.md가 있는지, Skills가 있는지 확인하고 한국어로 알려줘.\n없는 게 많아도 괜찮아. 지금부터 만들 거야.')">복사</button>
+            </div>
+            <div class="prompt-code">내 Claude Code 상태를 확인해줘.
+.claude 폴더가 있는지, CLAUDE.md가 있는지, Skills가 있는지 확인하고 한국어로 알려줘.
+없는 게 많아도 괜찮아. 지금부터 만들 거야.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="setup-step">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">2</div>
+          <div class="step-toggle-title">CLAUDE.md — Claude가 나를 기억하게 하기</div>
+          <div class="step-toggle-time">~15분</div>
+          <div class="step-arrow">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">Claude Code를 열고 아래 프롬프트에서 <strong>괄호 안만 내 정보로 바꿔서</strong> 붙여넣습니다.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">괄호 안만 수정 후 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`나만의 CLAUDE.md를 만들어줘. ~/.claude/CLAUDE.md 파일로 저장해줘.\n\n[내 정보]\n- 이름: (이름)\n- 회사: (회사명)\n- 업종: (예: 프롭테크, 헬스케어, 이커머스 등)\n- 직책: 대표이사\n- 개발 경험: 없음 (비개발자)\n- 주요 반복 업무: (예: 시장 리서치, 투자자 소통, 계약서 검토)\n- 자주 만드는 문서: (예: IR자료, PRD, 제안서)\n\n[포함할 내용]\n1. 나는 누구인가\n2. 응답 원칙: 한국어, 핵심부터, 구조화, 수치 근거\n3. 자주 하는 작업 목록\n4. 아웃풋 기본 형식\n5. 하지 말 것: 서론, 빈 칭찬, 모호한 표현\n\n300단어 이내로 짧게. 저장 후 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">나만의 CLAUDE.md를 만들어줘. ~/.claude/CLAUDE.md 파일로 저장해줘.
+
+[내 정보]
+- 이름: (이름)
+- 회사: (회사명)
+- 업종: (예: 프롭테크, 헬스케어, 이커머스 등)
+- 직책: 대표이사
+- 개발 경험: 없음 (비개발자)
+- 주요 반복 업무: (예: 시장 리서치, 투자자 소통, 계약서 검토)
+- 자주 만드는 문서: (예: IR자료, PRD, 제안서)
+
+[포함할 내용]
+1. 나는 누구인가
+2. 응답 원칙: 한국어, 핵심부터, 구조화, 수치 근거
+3. 자주 하는 작업 목록
+4. 아웃풋 기본 형식
+5. 하지 말 것: 서론, 빈 칭찬, 모호한 표현
+
+300단어 이내로 짧게. 저장 후 내용 보여줘.</div>
+          </div>
+          <div class="callout tip">
+            <div class="callout-icon">💡</div>
+            <div>처음엔 완벽하게 만들려 하지 마세요. 쓰다가 "이건 빠졌네" 싶으면 그때 추가하면 됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="setup-step">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">3</div>
+          <div class="step-toggle-title">Skills 설치 — /명령어 5개 한꺼번에</div>
+          <div class="step-toggle-time">~20분</div>
+          <div class="step-arrow">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">업종만 바꿔서 붙여넣으면 5개 명령어가 한꺼번에 설치됩니다.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">(업종)만 바꿔서 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`아래 5개 스킬을 ~/.claude/skills/ 에 생성해줘.\n내 업종은 (업종)이야.\n\n[research] 시장·경쟁사 리서치 → 인사이트3개+시장현황표+경쟁구도표+시사점. 수치 출처 명시.\n[investor] 투자자 문서 → ExecSummary+핵심지표표+문제→솔루션+WhyNow+투자요청. 작성 후 VC 관점 자체검토.\n[prd] 제품요구사항 → 배경+사용자스토리+핵심기능/제외범위+기술고려+일정+미결사항. 모호한 표현 금지.\n[email] 이메일 → 제목3개옵션+본문2버전(간결/상세). 수신자 유형별 어조 자동조정.\n[contract] 계약서 스크리닝 → 주의🔴+협상가능🟡+표준🟢+누락조항+종합의견. 법률 전문가 대체 아님 명시.\n\n각 SKILL.md 파일로 저장. 완료 후 폴더 트리 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">아래 5개 스킬을 ~/.claude/skills/ 에 생성해줘.
+내 업종은 (업종)이야.
+
+[research] 시장·경쟁사 리서치 → 인사이트3개+시장현황표+경쟁구도표+시사점. 수치 출처 명시.
+[investor] 투자자 문서 → ExecSummary+핵심지표표+문제→솔루션+WhyNow+투자요청. 작성 후 VC 관점 자체검토.
+[prd] 제품요구사항 → 배경+사용자스토리+핵심기능/제외범위+기술고려+일정+미결사항. 모호한 표현 금지.
+[email] 이메일 → 제목3개옵션+본문2버전(간결/상세). 수신자 유형별 어조 자동조정.
+[contract] 계약서 스크리닝 → 주의🔴+협상가능🟡+표준🟢+누락조항+종합의견. 법률 전문가 대체 아님 명시.
+
+각 SKILL.md 파일로 저장. 완료 후 폴더 트리 보여줘.</div>
+          </div>
+          <table class="skills-table">
+            <thead><tr><th>명령어</th><th>하는 일</th><th>실전 예시</th></tr></thead>
+            <tbody>
+              <tr><td>/research</td><td>시장·경쟁사 리서치 보고서</td><td>/research 국내 SaaS 시장 현황</td></tr>
+              <tr><td>/investor</td><td>IR자료, 1-pager, 업데이트 메일</td><td>/investor 시리즈A 1-pager</td></tr>
+              <tr><td>/prd</td><td>개발팀용 제품 요구사항 문서</td><td>/prd 알림 기능 추가</td></tr>
+              <tr><td>/email</td><td>VC·파트너·팀 메일 작성</td><td>/email VC 미팅 요청</td></tr>
+              <tr><td>/contract</td><td>계약서 사전 스크리닝</td><td>/contract [계약서 내용]</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warn">
+            <div class="callout-icon">⚠️</div>
+            <div>명령어가 안 먹히면 — "현재 skills 폴더 위치 확인해줘"라고 입력하면 Claude가 진단해줍니다. 경로는 반드시 <code style="font-family:monospace;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;">~/.claude/skills/</code> 이어야 합니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="setup-step">
+        <div class="step-toggle" onclick="toggleStep(this)">
+          <div class="step-badge">4</div>
+          <div class="step-toggle-title">실전 테스트 — 지금 바로 써보기</div>
+          <div class="step-toggle-time">~15분</div>
+          <div class="step-arrow">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc-text">실제 업무 소재로 테스트합니다. 결과가 마음에 안 들면 바로 추가 요청하면 됩니다.</div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">첫 테스트 — 업종 넣어서</div>
+              <button class="copy-btn" onclick="cp(this,'/research 국내 (업종) 시장 현황과 주요 경쟁사 비교')">복사</button>
+            </div>
+            <div class="prompt-code">/research 국내 (업종) 시장 현황과 주요 경쟁사 비교</div>
+          </div>
+          <div class="callout tip">
+            <div class="callout-icon">💡</div>
+            <div>결과 나오면 "표 부분만 더 구체적으로", "경쟁사 2개 추가해줘" 등 바로 수정 요청 가능합니다. 대화하듯이 쓰면 됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── AUTHOR ─── -->
+<section class="author-section">
+  <div class="author-inner">
+    <div class="author-name">한상</div>
+    <div class="author-role">스타트업 대표이사</div>
+    <div class="author-desc">
+      스타트업 대표로 살다 보면 해야 할 일은 많고, 혼자 감당해야 하는 것도 많다.<br>
+      시장 리서치, 계약서 검토, 개발팀에 넘길 PRD 작성까지 — 대표가 직접 챙겨야 하는 것들을 Claude Code로 하나씩 해보고 있다.<br><br>
+      이 가이드는 그 과정을 기록한 것이다. 써보면서 새로 알게 된 것, 더 잘 되는 방법을 계속 업데이트할 생각이다.<br><br>
+      서브 에이전트처럼 더 고도화된 활용법은 별도 페이지에서 다룰 예정이다.<br><br>
+      궁금한 것이 있거나 피드백이 있으면 링크드인 DM으로 편하게 연락주세요.
+    </div>
+    <div style="margin-top:20px;display:inline-block;background:rgba(108,99,245,.1);border:1px solid rgba(108,99,245,.2);color:var(--v1);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 · 2026년 3월 · 계속 업데이트 중</div>
+  </div>
+</section>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('prog').style.width = (window.scrollY / h * 100) + '%';
+    nav.classList.toggle('show', window.scrollY > 300);
+  });
+
+  function toggleStep(btn) {
+    const step = btn.closest('.setup-step');
+    step.classList.toggle('open');
+  }
+
+  function cp(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '복사됨 ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+</script>
+</body>
+</html>
