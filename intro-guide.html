@@ -164,6 +164,8 @@
     .section { padding:48px 24px; }
     .eco-grid, .term-grid { grid-template-columns:1fr; }
     .price-grid { grid-template-columns:1fr; }
+    .nav-links .nav-btn { font-size:10px; padding:3px 8px; }
+    .nav-brand { font-size:11px; }
   }
 </style>
 </head>
@@ -289,17 +291,19 @@
         <div class="eco-title">claude.ai</div>
         <div class="eco-desc">
           브라우저에서 바로 쓰는 채팅형 AI. ChatGPT와 같은 포지션.<br>
-          설치 없이 바로 시작할 수 있어 <strong style="color:var(--white);">비개발자에게 가장 적합</strong>합니다.<br><br>
-          <strong style="color:var(--white);">할 수 있는 것:</strong> 질문, 글쓰기, 번역, 문서 분석, 파일 업로드
+          설치 없이 바로 시작할 수 있어 <strong style="color:var(--white);">비개발자에게 가장 적합</strong>합니다.<br>
+          결과물도 만들어주고(Artifacts), 파일 업로드도 가능.<br><br>
+          <strong style="color:var(--white);">한 마디로:</strong> 브라우저 안에서 끝나는 AI
         </div>
       </div>
       <div class="eco-card active">
         <div class="eco-tag" style="color:var(--v1);">이 가이드의 주인공</div>
         <div class="eco-title" style="color:var(--v1);">Claude Code</div>
         <div class="eco-desc">
-          내 컴퓨터의 파일을 읽고, 쓰고, 검색하고, 웹도 뒤지는 AI.<br>
-          채팅만 하는 게 아니라 <strong style="color:var(--white);">실제 작업을 수행</strong>합니다.<br><br>
-          <strong style="color:var(--white);">할 수 있는 것:</strong> 리서치, 문서 작성, 파일 자동 저장, 반복 업무 자동화<br>
+          내 컴퓨터 안에 들어와서 일하는 AI.<br>
+          파일을 직접 읽고 참조 &rarr; 맥락을 파악해서 더 정확한 결과물.<br>
+          긴 문서도 잘리지 않고 파일로 바로 저장.<br>
+          반복 업무를 한 줄 명령으로 자동화 (Skills, 에이전트).<br><br>
           <strong style="color:var(--v3);">단, VSCode 설치 + 초기 세팅이 필요합니다 (이 가이드가 도와줍니다)</strong>
         </div>
       </div>
@@ -325,8 +329,8 @@
     <div class="callout info">
       <span>&#128276;</span>
       <div>
-        <strong>핵심 차이:</strong> claude.ai는 "대화만" 합니다. Claude Code는 대화 + <strong>파일 읽기/쓰기 + 웹 검색 + 자동화</strong>까지 합니다.
-        같은 AI인데 할 수 있는 범위가 다릅니다.
+        <strong>핵심 차이:</strong> claude.ai는 브라우저 안에서 끝나는 AI. Claude Code는 내 컴퓨터 안에 들어와서 일하는 AI.
+        같은 Claude인데 <strong>할 수 있는 범위</strong>가 다릅니다.
       </div>
     </div>
 
@@ -415,7 +419,7 @@
             <td style="color:var(--green);font-weight:700;">claude.ai</td>
             <td>일반 사용자</td>
             <td>대화, 글쓰기, 문서 분석</td>
-            <td style="color:var(--green);font-weight:700;">높음</td>
+            <td style="color:var(--green);font-weight:700;">가장 높음</td>
           </tr>
           <tr>
             <td>Cursor</td>
@@ -439,7 +443,7 @@
             <td style="color:var(--v1);font-weight:800;">Claude Code</td>
             <td>개발자 (비개발자도 세팅하면 가능)</td>
             <td>코드 + 문서 + 리서치 + 자동화</td>
-            <td style="color:var(--v3);font-weight:700;">중간 (세팅 필요)</td>
+            <td style="color:var(--red);">낮음 (세팅하면 가능)</td>
           </tr>
         </tbody>
       </table>
@@ -455,20 +459,23 @@
       </div>
     </div>
 
-    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">그럼에도 Claude Code를 세팅하는 이유</div>
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">그럼에도 내가 Claude Code를 사용하는 이유</div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">1. claude.ai는 "대화"만 합니다</strong> &mdash; Claude Code는 대화 + 파일 생성/수정 + 웹 검색 + 자동화까지. 할 수 있는 범위가 다릅니다.
+        <strong style="color:var(--white);">1. 결과물이 파일로 바로 저장됩니다</strong> &mdash; claude.ai는 복사-붙여넣기가 필요하지만, Claude Code는 파일로 바로 저장. 30페이지 분량도 잘리지 않습니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">2. 반복 업무를 한 줄로 실행합니다</strong> &mdash; "/research 경쟁사 분석"처럼 단축 명령어를 만들 수 있습니다. claude.ai에서는 매번 처음부터 설명해야 합니다.
+        <strong style="color:var(--white);">2. 내 파일을 직접 읽고 참조합니다</strong> &mdash; 계약서 10개를 폴더에 넣고 "리스크 조항 뽑아줘"하면 다 읽고 정리. claude.ai는 하나씩 업로드해야 합니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">3. AI 팀을 구성할 수 있습니다</strong> &mdash; 리서치팀, 법무팀, 기획팀을 만들어서 역할별로 일을 시킬 수 있습니다.
+        <strong style="color:var(--white);">3. 반복 업무를 한 줄로 실행합니다</strong> &mdash; "/research 경쟁사 분석"처럼 단축 명령어를 만들 수 있습니다. claude.ai에서는 매번 처음부터 설명해야 합니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">4. 세팅은 한 번이면 됩니다</strong> &mdash; 이 가이드를 따라 1시간 정도 세팅하면, 이후에는 claude.ai만큼 편하게 쓸 수 있습니다.
+        <strong style="color:var(--white);">4. AI 팀을 구성할 수 있습니다</strong> &mdash; 리서치팀, 법무팀, 기획팀을 역할별로 만들어 동시에 일을 시킬 수 있습니다.
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">5. 세팅은 한 번이면 됩니다</strong> &mdash; 이 가이드를 따라 세팅하면, 이후에는 claude.ai만큼 편하게 쓸 수 있습니다.
       </div>
     </div>
   </div>
@@ -616,7 +623,7 @@
         자정 리셋이 아닙니다. 한도에 도달한 시점부터 <strong>약 5시간 후 회복</strong>됩니다.
         한도 초과 시 차단이 아니라 일시 대기이며, 추가 과금은 없습니다.
         Opus(고성능 모델) 사용 시 한도가 더 빨리 소진됩니다.<br><br>
-        <strong>사용량 확인:</strong> Claude Code에서 <code style="background:var(--s2);padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;">/cost</code> 또는 <code style="background:var(--s2);padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;">/stats</code>를 입력하면 현재 세션의 토큰 사용량을 확인할 수 있습니다.
+        <strong>사용량 확인:</strong> 남은 사용량을 미리 확인하는 기능은 아직 없습니다. 한도에 도달하면 리셋 시각이 표시되니, 그때까지 대기하면 됩니다.
       </div>
     </div>
 
