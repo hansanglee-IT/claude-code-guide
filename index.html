@@ -43,14 +43,11 @@
   }
   #nav.show { transform:translateY(0); }
   .nav-brand { font-size:13px; font-weight:700; color:var(--white); }
-  .nav-links { display:flex; gap:6px; }
-  .nav-link {
-    font-size:11px; padding:4px 10px; border-radius:5px;
-    background:var(--s2); border:1px solid var(--border);
-    color:var(--text-mid); cursor:pointer; text-decoration:none;
-    transition:all .15s;
-  }
-  .nav-link:hover { color:var(--v1); border-color:var(--v1); }
+  .nav-links { display:flex; gap:8px; }
+  .nav-btn { font-size:11px; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:4px 12px; border-radius:5px; transition:all .15s; font-weight:600; }
+  .nav-btn:hover { color:var(--v1); border-color:var(--v1); }
+  .nav-btn.next { background:rgba(62,207,142,.1); color:var(--green); border-color:rgba(62,207,142,.25); }
+  .nav-btn.next:hover { background:rgba(62,207,142,.2); }
 
   /* ─── HERO ─── */
   .hero {
@@ -376,17 +373,12 @@
 <div id="prog"></div>
 
 <nav id="nav">
-  <div class="nav-brand">Claude Code 가이드 — 한상</div>
   <div class="nav-links">
-    <a class="nav-link" href="#why">웹 Claude vs Claude Code</a>
-    <a class="nav-link" href="#concepts">핵심 개념</a>
-    <a class="nav-link" href="#usecases">어디에 써볼까</a>
-    <a class="nav-link" href="#setup">세팅하기</a>
-    <a class="nav-link" href="#output">결과 활용</a>
-    <a class="nav-link" href="#commands">명령어</a>
-    <a class="nav-link" href="#planmode">플랜 모드</a>
-    <a class="nav-link" href="#resources">참고 자료</a>
-    <a class="nav-link" href="#next" style="background:rgba(62,207,142,.12);color:var(--green);border:1px solid rgba(62,207,142,.25);padding:4px 12px;border-radius:6px;">다음 단계 →</a>
+    <a class="nav-btn" href="intro-guide.html">&larr; 0단계 개념</a>
+  </div>
+  <div class="nav-brand">Claude Code 가이드 — 1단계</div>
+  <div class="nav-links">
+    <a class="nav-btn next" href="subagent-guide.html">2단계 AI 팀 구성 &rarr;</a>
   </div>
 </nav>
 
@@ -1422,8 +1414,9 @@
     <div class="author-name">한상</div>
     <div class="author-role">스타트업 대표이사</div>
     <div class="author-desc">
-      비개발자 스타트업 대표가 Claude Code를 직접 세팅하며 만든 가이드입니다.<br>
-      써보면서 더 좋은 방법을 발견하면 계속 업데이트합니다.
+      스타트업 대표로 살다 보면 해야 할 일은 많고, 혼자 감당해야 하는 것도 많습니다.<br>
+      시장 리서치, 계약서 검토, 개발팀에 넘길 PRD 작성까지 — 대표가 직접 챙겨야 하는 것들을 Claude Code로 하나씩 해보고 있습니다.<br><br>
+      이 가이드는 그 과정을 기록한 것입니다. 써보면서 새로 알게 된 것, 더 잘 되는 방법을 계속 업데이트할 생각입니다.
     </div>
     <div style="margin-top:20px;display:inline-block;background:rgba(108,99,245,.1);border:1px solid rgba(108,99,245,.2);color:var(--v1);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 · 2026년 3월 · 계속 업데이트 중</div>
   </div>
