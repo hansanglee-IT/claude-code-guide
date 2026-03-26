@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 0단계 — Claude 이해하기 | 한상</title>
+<meta name="description" content="Claude가 뭔지, Claude Code는 뭐가 다른지, 비개발자가 시작 전에 알아야 할 모든 기본 개념을 정리합니다.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --s1: #111118;
+    --s2: #18181f;
+    --s3: #20202a;
+    --border: #26263a;
+    --border2: #32324a;
+    --text: #d8d8e8;
+    --text-mid: #8080a0;
+    --text-dim: #484860;
+    --white: #f0f0f8;
+    --v1: #6c63f5;
+    --v2: #3ecfca;
+    --v3: #f5a623;
+    --red: #f55a5a;
+    --green: #3ecf8e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.75; }
+
+  #prog { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--v1),var(--v2)); z-index:200; transition:width .2s; }
+
+  #nav {
+    position:fixed; top:0; left:0; right:0;
+    background:rgba(9,9,15,.92); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:12px 40px; display:flex; align-items:center; justify-content:space-between;
+    z-index:100; transform:translateY(-100%); transition:transform .3s;
+  }
+  #nav.show { transform:translateY(0); }
+  .nav-brand { font-size:13px; font-weight:700; color:var(--white); }
+  .nav-next { font-size:11px; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:4px 12px; border-radius:5px; transition:all .15s; }
+  .nav-next:hover { color:var(--v1); border-color:var(--v1); }
+
+  /* HERO */
+  .hero {
+    min-height:80vh; display:flex; flex-direction:column;
+    justify-content:center; padding:100px 60px 80px;
+    position:relative; overflow:hidden; border-bottom:1px solid var(--border);
+  }
+  .hero::before {
+    content:''; position:absolute; top:-10%; right:-5%;
+    width:55%; height:75%;
+    background:radial-gradient(ellipse,rgba(108,99,245,.06) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .hero-inner { max-width:760px; position:relative; z-index:1; }
+
+  .series-nav { display:flex; align-items:center; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+  .series-item { font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; letter-spacing:.08em; }
+  .series-item.current { background:rgba(108,99,245,.15); color:var(--v1); border:1px solid rgba(108,99,245,.25); }
+  .series-item.upcoming { background:var(--s2); color:var(--text-dim); border:1px solid var(--border); }
+  .series-arrow { color:var(--text-dim); font-size:12px; }
+
+  .hero h1 {
+    font-family:'Noto Serif KR',serif;
+    font-size:clamp(28px,5vw,50px); font-weight:900;
+    color:var(--white); line-height:1.2; margin-bottom:20px;
+  }
+  .hero h1 em { font-style:normal; color:var(--v1); }
+  .hero-lead { font-size:16px; color:var(--text-mid); max-width:560px; line-height:1.85; margin-bottom:36px; }
+
+  /* SECTIONS */
+  .section { padding:72px 60px; border-bottom:1px solid var(--border); }
+  .section-inner { max-width:800px; margin:0 auto; }
+  .eyebrow { font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+  .section-h { font-size:clamp(20px,3vw,30px); font-weight:800; color:var(--white); line-height:1.3; margin-bottom:24px; }
+
+  /* CARDS */
+  .eco-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0; }
+  .eco-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:22px 24px;
+  }
+  .eco-card.active { border-color:rgba(108,99,245,.3); }
+  .eco-tag { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+  .eco-title { font-size:16px; font-weight:800; color:var(--white); margin-bottom:8px; }
+  .eco-desc { font-size:13.5px; color:var(--text-mid); line-height:1.75; }
+
+  /* COMPARE TABLE */
+  .cmp-table { width:100%; border-collapse:collapse; font-size:13.5px; margin:16px 0; }
+  .cmp-table th {
+    text-align:left; padding:10px 16px; font-size:11px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim);
+    border-bottom:1px solid var(--border); background:var(--s2);
+  }
+  .cmp-table td { padding:10px 16px; border-bottom:1px solid rgba(38,38,58,.5); color:var(--text-mid); }
+  .cmp-table tr:last-child td { border-bottom:none; }
+  .cmp-table td:first-child { color:var(--text); font-weight:600; }
+
+  /* TERM CARDS */
+  .term-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+  .term-card {
+    background:var(--s2); border:1px solid var(--border);
+    border-radius:8px; padding:14px 18px;
+  }
+  .term-word { font-size:13px; font-weight:800; color:var(--white); margin-bottom:4px; }
+  .term-eng { font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-bottom:6px; }
+  .term-def { font-size:12.5px; color:var(--text-mid); line-height:1.7; }
+
+  /* CALLOUT */
+  .callout { border-radius:8px; padding:12px 16px; margin:12px 0; font-size:13.5px; line-height:1.7; display:flex; gap:10px; }
+  .tip { background:rgba(62,207,202,.07); border:1px solid rgba(62,207,202,.18); color:#70d8d0; }
+  .info { background:rgba(108,99,245,.07); border:1px solid rgba(108,99,245,.18); color:#a098f0; }
+  .note { background:rgba(245,166,35,.07); border:1px solid rgba(245,166,35,.18); color:#d4a843; }
+
+  /* PRICING */
+  .price-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; }
+  .price-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:22px 20px; text-align:center;
+  }
+  .price-card.recommended { border-color:rgba(108,99,245,.35); }
+  .price-name { font-size:14px; font-weight:800; color:var(--white); margin-bottom:4px; }
+  .price-cost { font-size:22px; font-weight:900; color:var(--v1); margin-bottom:8px; }
+  .price-cost span { font-size:13px; font-weight:400; color:var(--text-dim); }
+  .price-desc { font-size:12.5px; color:var(--text-mid); line-height:1.7; }
+  .price-badge {
+    display:inline-block; font-size:10px; font-weight:700; padding:3px 10px;
+    border-radius:4px; background:rgba(108,99,245,.15); color:var(--v1);
+    border:1px solid rgba(108,99,245,.25); margin-bottom:10px;
+  }
+
+  /* AUTHOR */
+  .author-section {
+    padding:60px; text-align:center;
+    background:linear-gradient(180deg,var(--bg) 0%,var(--s1) 100%);
+  }
+  .author-inner { max-width:480px; margin:0 auto; }
+  .author-name { font-size:18px; font-weight:900; color:var(--white); margin-bottom:4px; }
+  .author-role { font-size:13px; color:var(--text-dim); margin-bottom:16px; }
+  .author-desc { font-size:14px; color:var(--text-mid); line-height:1.85; }
+
+  /* FLOW */
+  .flow-box {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:14px; padding:28px 24px; margin:20px 0;
+  }
+  .flow-label { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:20px; }
+  .flow-steps { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+  .flow-step {
+    background:var(--s2); border:1px solid var(--border2);
+    border-radius:8px; padding:10px 18px; font-size:13px; font-weight:600; color:var(--text);
+  }
+  .flow-step.highlight { border-color:var(--v1); color:var(--v1); }
+  .flow-arr { color:var(--text-dim); font-size:14px; }
+
+  @media (max-width:700px) {
+    .hero { padding:80px 24px 60px; }
+    .section { padding:48px 24px; }
+    .eco-grid, .term-grid { grid-template-columns:1fr; }
+    .price-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<nav id="nav">
+  <div class="nav-brand">0단계 — Claude 이해하기</div>
+  <a class="nav-next" href="index.html">1단계로 &rarr;</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="series-nav">
+      <span class="series-item current">0단계 &middot; Claude 이해하기</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item upcoming">1단계 &middot; 기본 세팅</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item upcoming">2단계 &middot; AI 팀 구성</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item upcoming">3단계 &middot; 팀 협업</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item upcoming">4단계 &middot; MCP 연동</span>
+    </div>
+
+    <h1>세팅 전에<br><em>Claude</em>부터<br>이해하고 가자</h1>
+
+    <div class="hero-lead">
+      Claude AI, Claude Code, API, Cursor, GPT...<br>
+      비슷한 이름이 너무 많습니다.<br>
+      1단계 세팅을 시작하기 전에, 이것들이 뭐가 다른지 5분 만에 정리합니다.
+    </div>
+  </div>
+</section>
+
+<!-- Claude는 뭔가 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">기본 개념</div>
+    <div class="section-h">Claude는 뭔가</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:20px;line-height:1.85;">
+      <strong style="color:var(--white);">Claude</strong>는 Anthropic이라는 회사가 만든 AI입니다.<br>
+      ChatGPT를 만든 OpenAI에서 나온 사람들이 세운 회사이고, "안전한 AI"를 핵심 가치로 내세웁니다.
+    </p>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th style="width:30%;">구분</th>
+            <th style="width:35%;">ChatGPT</th>
+            <th style="width:35%;">Claude</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>만든 회사</td>
+            <td>OpenAI</td>
+            <td>Anthropic</td>
+          </tr>
+          <tr>
+            <td>핵심 모델</td>
+            <td>GPT-4o, GPT-4.1</td>
+            <td>Claude Opus, Sonnet, Haiku</td>
+          </tr>
+          <tr>
+            <td>강점</td>
+            <td>범용성, 플러그인 생태계</td>
+            <td>긴 문서 처리, 정확한 지시 이행, 코드</td>
+          </tr>
+          <tr>
+            <td>웹 서비스</td>
+            <td>chat.openai.com</td>
+            <td>claude.ai</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">LLM이 뭔데?</div>
+    <p style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:16px;">
+      Claude든 ChatGPT든, 핵심 기술은 <strong style="color:var(--white);">LLM(Large Language Model, 대규모 언어 모델)</strong>입니다.<br>
+      쉽게 말하면 "엄청나게 많은 텍스트를 학습해서, 다음에 올 말을 예측하는 AI"입니다.
+    </p>
+
+    <div class="flow-box">
+      <div class="flow-label">LLM 작동 원리 (초간단 버전)</div>
+      <div class="flow-steps">
+        <div class="flow-step">내가 질문을 입력</div>
+        <div class="flow-arr">&rarr;</div>
+        <div class="flow-step highlight">AI가 학습한 패턴에서 최적의 답을 생성</div>
+        <div class="flow-arr">&rarr;</div>
+        <div class="flow-step">답변 출력</div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span>&#128161;</span>
+      <div>
+        Claude가 특히 잘하는 것: <strong>긴 문서 분석</strong>(20만 토큰, 약 15만 자 처리 가능), <strong>지시 사항을 정확히 따르기</strong>, <strong>코드 작성</strong>. 계약서 검토, PRD 작성 같은 업무에 강한 이유입니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Claude 생태계 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">생태계</div>
+    <div class="section-h">다 Claude인데, 뭐가 다른 건가</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:24px;line-height:1.85;">
+      "Claude"라는 이름이 붙은 제품이 여러 개입니다. 각각 용도가 다릅니다.
+    </p>
+
+    <div class="eco-grid">
+      <div class="eco-card">
+        <div class="eco-tag" style="color:var(--text-dim);">웹/앱</div>
+        <div class="eco-title">claude.ai</div>
+        <div class="eco-desc">
+          브라우저에서 바로 쓰는 채팅형 AI.<br>
+          ChatGPT 웹사이트와 같은 포지션.<br><br>
+          <strong style="color:var(--white);">용도:</strong> 간단한 질문, 글쓰기, 번역<br>
+          <strong style="color:var(--white);">비유:</strong> 카카오톡으로 AI한테 물어보기
+        </div>
+      </div>
+      <div class="eco-card active">
+        <div class="eco-tag" style="color:var(--v1);">이 가이드의 주인공</div>
+        <div class="eco-title" style="color:var(--v1);">Claude Code</div>
+        <div class="eco-desc">
+          컴퓨터의 파일을 읽고, 쓰고, 검색하고, 웹도 뒤지는 AI.<br>
+          채팅만 하는 게 아니라 <strong style="color:var(--white);">실제 작업을 수행</strong>.<br><br>
+          <strong style="color:var(--white);">용도:</strong> 리서치, 문서 작성, 파일 관리, 자동화<br>
+          <strong style="color:var(--white);">비유:</strong> AI 비서가 내 컴퓨터에 상주
+        </div>
+      </div>
+      <div class="eco-card">
+        <div class="eco-tag" style="color:var(--text-dim);">개발자용</div>
+        <div class="eco-title">Claude API</div>
+        <div class="eco-desc">
+          개발자가 자기 제품에 Claude를 연결할 때 쓰는 것.<br>
+          코드로 Claude를 호출하는 방식.<br><br>
+          <strong style="color:var(--white);">용도:</strong> 앱/서비스에 AI 기능 탑재<br>
+          <strong style="color:var(--white);">비유:</strong> AI 엔진을 내 차에 장착
+        </div>
+      </div>
+      <div class="eco-card">
+        <div class="eco-tag" style="color:var(--text-dim);">모바일</div>
+        <div class="eco-title">Claude 앱</div>
+        <div class="eco-desc">
+          iOS/Android에서 쓰는 Claude.<br>
+          claude.ai의 모바일 버전.<br><br>
+          <strong style="color:var(--white);">용도:</strong> 이동 중 간단한 질문<br>
+          <strong style="color:var(--white);">비유:</strong> 주머니 속 AI 비서
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span>&#128276;</span>
+      <div>
+        <strong>핵심 차이:</strong> claude.ai는 "대화만" 합니다. Claude Code는 대화 + <strong>파일 읽기/쓰기 + 웹 검색 + 자동화</strong>까지 합니다.
+        같은 AI인데 할 수 있는 범위가 다릅니다.
+      </div>
+    </div>
+
+    <!-- claude.ai vs Claude Code 구체 비교 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:28px 0 12px;">claude.ai vs Claude Code — 구체적으로 뭐가 다른가</div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>기능</th>
+            <th>claude.ai (웹)</th>
+            <th>Claude Code</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>대화/질문</td>
+            <td style="color:var(--green);">O</td>
+            <td style="color:var(--green);">O</td>
+          </tr>
+          <tr>
+            <td>파일 읽기</td>
+            <td>업로드한 파일만</td>
+            <td style="color:var(--green);">내 컴퓨터 전체</td>
+          </tr>
+          <tr>
+            <td>파일 생성/수정</td>
+            <td style="color:var(--red);">X</td>
+            <td style="color:var(--green);">O (자동 저장)</td>
+          </tr>
+          <tr>
+            <td>웹 검색</td>
+            <td>제한적</td>
+            <td style="color:var(--green);">O</td>
+          </tr>
+          <tr>
+            <td>반복 업무 자동화</td>
+            <td style="color:var(--red);">X</td>
+            <td style="color:var(--green);">O (Skills, 에이전트)</td>
+          </tr>
+          <tr>
+            <td>여러 팀 동시 실행</td>
+            <td style="color:var(--red);">X</td>
+            <td style="color:var(--green);">O (Agent Teams)</td>
+          </tr>
+          <tr>
+            <td>설치 필요</td>
+            <td>없음 (브라우저)</td>
+            <td>VSCode + 확장 프로그램</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 다른 AI 툴 비교 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">비교</div>
+    <div class="section-h">Claude Code vs 다른 AI 도구들</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:20px;line-height:1.85;">
+      "AI 코딩 도구"라고 불리는 것들이 많습니다. 각각 타겟이 다릅니다.
+    </p>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>도구</th>
+            <th>주 타겟</th>
+            <th>핵심 용도</th>
+            <th>비개발자 적합도</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ChatGPT</td>
+            <td>일반 사용자</td>
+            <td>대화, 글쓰기, 질문</td>
+            <td style="color:var(--green);">높음</td>
+          </tr>
+          <tr>
+            <td>Cursor</td>
+            <td>개발자</td>
+            <td>코드 작성 특화 에디터</td>
+            <td style="color:var(--red);">낮음</td>
+          </tr>
+          <tr>
+            <td>Windsurf</td>
+            <td>개발자</td>
+            <td>코드 작성 + AI 에이전트</td>
+            <td style="color:var(--red);">낮음</td>
+          </tr>
+          <tr>
+            <td>GitHub Copilot</td>
+            <td>개발자</td>
+            <td>코드 자동완성</td>
+            <td style="color:var(--red);">낮음</td>
+          </tr>
+          <tr>
+            <td style="color:var(--v1);font-weight:800;">Claude Code</td>
+            <td>개발자 + 비개발자</td>
+            <td>코드 + 문서 + 리서치 + 자동화</td>
+            <td style="color:var(--green);font-weight:700;">높음</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">비개발자한테 Claude Code가 좋은 이유</div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">1. 코드를 몰라도 됩니다</strong> &mdash; 한국어로 "시장 리서치 해줘"라고 말하면 실행됩니다. 코드를 직접 쓸 일이 없습니다.
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">2. 파일을 직접 만들어줍니다</strong> &mdash; "PRD 작성해줘"라고 하면 대화 내용이 아니라 실제 파일로 저장됩니다. 복사/붙여넣기가 필요 없습니다.
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">3. 반복 업무를 자동화할 수 있습니다</strong> &mdash; Skills(단축 명령어)와 에이전트(AI 팀원)를 만들어서, 자주 하는 업무를 한 줄로 실행할 수 있습니다.
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">4. 내 상황을 기억합니다</strong> &mdash; CLAUDE.md에 내 정보(회사, 업종, 선호 스타일)를 적어두면, 매번 설명하지 않아도 맥락을 유지합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 용어 정리 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">용어 사전</div>
+    <div class="section-h">시작 전에 알아야 할 단어들</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:20px;line-height:1.85;">
+      1단계 가이드에서 이 단어들이 나옵니다. 외울 필요 없고, 나중에 헷갈리면 여기로 돌아오세요.
+    </p>
+
+    <!-- 환경 -->
+    <div style="font-size:13px;font-weight:700;color:var(--v2);margin-bottom:10px;letter-spacing:.08em;">작업 환경</div>
+    <div class="term-grid">
+      <div class="term-card">
+        <div class="term-word">VSCode</div>
+        <div class="term-eng">Visual Studio Code</div>
+        <div class="term-def">Microsoft가 만든 무료 코드 편집기. Claude Code는 여기에 설치합니다. 개발자뿐 아니라 문서 작업에도 쓸 수 있습니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">터미널</div>
+        <div class="term-eng">Terminal</div>
+        <div class="term-def">텍스트로 컴퓨터에 명령을 내리는 창. VSCode 안에 내장되어 있어서 따로 열 필요 없습니다. Claude Code가 여기서 실행됩니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">IDE</div>
+        <div class="term-eng">Integrated Development Environment</div>
+        <div class="term-def">통합 개발 환경. VSCode가 대표적인 IDE입니다. "IDE에서 실행하세요" = "VSCode에서 하세요"와 같은 말입니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">확장 프로그램</div>
+        <div class="term-eng">Extension</div>
+        <div class="term-def">VSCode에 기능을 추가하는 플러그인. Claude Code도 VSCode 확장 프로그램으로 설치합니다. 앱스토어에서 앱 설치하는 것과 같습니다.</div>
+      </div>
+    </div>
+
+    <!-- Claude Code 핵심 -->
+    <div style="font-size:13px;font-weight:700;color:var(--v1);margin:24px 0 10px;letter-spacing:.08em;">Claude Code 핵심 개념</div>
+    <div class="term-grid">
+      <div class="term-card">
+        <div class="term-word">CLAUDE.md</div>
+        <div class="term-eng">Claude Memory Document</div>
+        <div class="term-def">Claude에게 "나는 누구인지, 어떻게 일하고 싶은지"를 알려주는 파일. 한 번 작성하면 매번 반복 설명이 필요 없습니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">Skills (스킬)</div>
+        <div class="term-eng">/research, /prd, /email 등</div>
+        <div class="term-def">자주 하는 업무를 단축 명령어로 만든 것. "/research 경쟁사 분석"처럼 한 줄로 실행합니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">서브 에이전트</div>
+        <div class="term-eng">Sub Agent</div>
+        <div class="term-def">역할과 전문성을 가진 AI 팀원. "리서치팀", "법무팀"처럼 각자 맡은 일이 정해져 있습니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">Agent Teams</div>
+        <div class="term-eng">에이전트 팀</div>
+        <div class="term-def">여러 서브 에이전트가 동시에 일하며 서로 소통하는 기능. 프로젝트 단위로 팀을 투입할 때 씁니다.</div>
+      </div>
+    </div>
+
+    <!-- 기타 -->
+    <div style="font-size:13px;font-weight:700;color:var(--v3);margin:24px 0 10px;letter-spacing:.08em;">자주 나오는 기타 용어</div>
+    <div class="term-grid">
+      <div class="term-card">
+        <div class="term-word">프롬프트</div>
+        <div class="term-eng">Prompt</div>
+        <div class="term-def">AI에게 하는 질문이나 지시. "시장 리서치 해줘"가 프롬프트입니다. 잘 쓰면 결과가 좋아집니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">토큰</div>
+        <div class="term-eng">Token</div>
+        <div class="term-def">AI가 텍스트를 처리하는 단위. 한국어 1글자 = 약 2~3토큰. 토큰을 많이 쓸수록 비용이 올라갑니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">컨텍스트</div>
+        <div class="term-eng">Context</div>
+        <div class="term-def">AI가 한 번에 기억할 수 있는 대화량. Claude는 약 20만 토큰(책 1권 분량)까지 기억합니다.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-word">MCP</div>
+        <div class="term-eng">Model Context Protocol</div>
+        <div class="term-def">Claude Code를 Gmail, Notion, Slack 같은 외부 도구에 연결하는 기술. 4단계에서 다룹니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 요금제 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">요금제</div>
+    <div class="section-h">뭘 결제해야 하나</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:20px;line-height:1.85;">
+      Claude Code를 쓰려면 유료 요금제가 필요합니다. 3가지 옵션이 있습니다.
+    </p>
+
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-name">Pro</div>
+        <div class="price-cost">$20<span>/월</span></div>
+        <div class="price-desc">
+          Claude Code 사용 가능<br>
+          일일 사용량 제한 있음<br>
+          가벼운 업무에 충분
+        </div>
+      </div>
+      <div class="price-card recommended">
+        <div class="price-badge">추천</div>
+        <div class="price-name">Max</div>
+        <div class="price-cost">$100<span>/월</span></div>
+        <div class="price-desc">
+          Claude Code 무제한에 가까움<br>
+          Agent Teams 활용에 적합<br>
+          토큰 걱정 없이 사용
+        </div>
+      </div>
+      <div class="price-card">
+        <div class="price-name">API 과금</div>
+        <div class="price-cost">종량제</div>
+        <div class="price-desc">
+          쓴 만큼만 과금<br>
+          개발자/서비스 연동용<br>
+          비개발자에게는 비추천
+        </div>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span>&#128218;</span>
+      <div>
+        <strong>추천:</strong> 처음 시작한다면 <strong>Pro($20)</strong>로 시작하세요. 1~2단계까지는 충분합니다. 3단계(Agent Teams)를 본격적으로 쓰기 시작하면 <strong>Max($100)</strong>로 올리면 됩니다.
+      </div>
+    </div>
+
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:24px 0 12px;">결제 방법</div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>단계</th>
+            <th>방법</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong style="color:var(--white);">claude.ai</strong> 접속 &rarr; 회원가입</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>설정(Settings) &rarr; 요금제(Subscription) &rarr; Pro 또는 Max 선택</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>카드 결제 (해외 결제 가능 카드 필요)</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>결제 완료 후 Claude Code 사용 가능</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 다음 단계 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">다음 단계</div>
+    <div class="section-h">이제 세팅을 시작하세요</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:24px;line-height:1.85;">
+      Claude가 뭔지, Claude Code는 뭐가 다른지, 요금제는 어떻게 되는지 — 기본 개념을 잡았습니다.<br>
+      이제 1단계에서 실제로 세팅을 시작합니다.
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <!-- 0단계 완료 -->
+      <div style="display:flex;align-items:center;gap:20px;background:rgba(108,99,245,.08);border:1px solid rgba(108,99,245,.2);border-radius:12px;padding:20px 24px;">
+        <div style="width:48px;height:48px;border-radius:10px;background:var(--v1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:white;flex-shrink:0;text-align:center;line-height:1.3;">0단계</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="font-size:15px;font-weight:800;color:var(--white);">Claude 이해하기</div>
+            <div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(62,207,142,.15);color:var(--green);border:1px solid rgba(62,207,142,.25);">완료</div>
+          </div>
+          <div style="font-size:13px;color:var(--text-mid);">기본 개념, 생태계, 용어, 요금제를 이해했습니다.</div>
+        </div>
+        <div style="font-size:20px;color:rgba(62,207,142,.5);">&#10003;</div>
+      </div>
+
+      <!-- 1단계 -->
+      <div style="display:flex;align-items:center;gap:20px;background:rgba(62,207,142,.06);border:1px solid rgba(62,207,142,.2);border-radius:12px;padding:20px 24px;">
+        <div style="width:48px;height:48px;border-radius:10px;background:rgba(62,207,142,.15);border:1px solid rgba(62,207,142,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--green);flex-shrink:0;text-align:center;line-height:1.3;">1단계</div>
+        <div style="flex:1;">
+          <div style="font-size:15px;font-weight:800;color:var(--white);margin-bottom:4px;">기본 세팅 — CLAUDE.md + Skills</div>
+          <div style="font-size:13px;color:var(--text-mid);">VSCode 설치부터 시장 리서치, 계약서 검토, PRD 작성까지.</div>
+        </div>
+        <a href="index.html" style="background:var(--green);color:#0a1a10;font-size:13px;font-weight:800;padding:10px 20px;border-radius:8px;text-decoration:none;white-space:nowrap;flex-shrink:0;">1단계 시작 &rarr;</a>
+      </div>
+
+      <!-- 2~4 단계 -->
+      <div style="display:flex;align-items:center;gap:20px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 24px;">
+        <div style="flex:1;display:flex;gap:20px;align-items:center;">
+          <div style="font-size:12px;color:var(--text-dim);">이후 단계:</div>
+          <div style="font-size:13px;color:var(--text-mid);">
+            2단계 AI 팀 구성 &rarr; 3단계 팀 협업 &rarr; 4단계 MCP 연동
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section class="author-section">
+  <div class="author-inner">
+    <div class="author-name">한상</div>
+    <div class="author-role">스타트업 대표이사</div>
+    <div class="author-desc">
+      저도 처음엔 Claude AI랑 Claude Code가 뭐가 다른지 몰랐습니다.<br>
+      터미널이 뭔지도 몰랐고, 토큰이 뭔지도 몰랐습니다.<br><br>
+      그래서 이 0단계를 만들었습니다.<br>
+      여기 나온 것만 알면 1단계 세팅을 따라갈 수 있습니다.
+    </div>
+    <div style="margin-top:20px;display:inline-block;background:rgba(108,99,245,.1);border:1px solid rgba(108,99,245,.2);color:var(--v1);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 &middot; 2026년 3월</div>
+  </div>
+</section>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('prog').style.width = (window.scrollY / h * 100) + '%';
+    nav.classList.toggle('show', window.scrollY > 300);
+  });
+</script>
+</body>
+</html>
