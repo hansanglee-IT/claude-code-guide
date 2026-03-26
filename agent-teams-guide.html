@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 3단계 — AI 팀 협업 시스템 | 한상</title>
+<meta name="description" content="Agent Teams로 리서치팀, 기획팀, 법무팀이 동시에 일하는 협업 시스템 구축. 스타트업 대표를 위한 고급 활용 가이드.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --s1: #111118;
+    --s2: #18181f;
+    --s3: #20202a;
+    --border: #26263a;
+    --border2: #32324a;
+    --text: #d8d8e8;
+    --text-mid: #8080a0;
+    --text-dim: #484860;
+    --white: #f0f0f8;
+    --v1: #6c63f5;
+    --v2: #3ecfca;
+    --v3: #f5a623;
+    --red: #f55a5a;
+    --green: #3ecf8e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.75; }
+
+  #prog { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--v1),var(--v2)); z-index:200; transition:width .2s; }
+
+  #nav {
+    position:fixed; top:0; left:0; right:0;
+    background:rgba(9,9,15,.92); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:12px 40px; display:flex; align-items:center; justify-content:space-between;
+    z-index:100; transform:translateY(-100%); transition:transform .3s;
+  }
+  #nav.show { transform:translateY(0); }
+  .nav-brand { font-size:13px; font-weight:700; color:var(--white); }
+  .nav-back { font-size:11px; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:4px 12px; border-radius:5px; transition:all .15s; }
+  .nav-back:hover { color:var(--v2); border-color:var(--v2); }
+
+  /* HERO */
+  .hero {
+    min-height:80vh; display:flex; flex-direction:column;
+    justify-content:center; padding:100px 60px 80px;
+    position:relative; overflow:hidden; border-bottom:1px solid var(--border);
+  }
+  .hero::before {
+    content:''; position:absolute; top:-10%; right:-5%;
+    width:55%; height:75%;
+    background:radial-gradient(ellipse,rgba(108,99,245,.06) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .hero-inner { max-width:760px; position:relative; z-index:1; }
+
+  .series-nav {
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:28px; flex-wrap:wrap;
+  }
+  .series-item {
+    font-size:11px; font-weight:700; padding:4px 12px;
+    border-radius:20px; letter-spacing:.08em;
+  }
+  .series-item.done { background:rgba(108,99,245,.15); color:var(--v1); border:1px solid rgba(108,99,245,.25); }
+  .series-item.current { background:rgba(62,207,202,.15); color:var(--v2); border:1px solid rgba(62,207,202,.3); }
+  .series-item.upcoming { background:var(--s2); color:var(--text-dim); border:1px solid var(--border); }
+  .series-arrow { color:var(--text-dim); font-size:12px; }
+
+  .hero h1 {
+    font-family:'Noto Serif KR',serif;
+    font-size:clamp(28px,5vw,50px); font-weight:900;
+    color:var(--white); line-height:1.2; margin-bottom:20px;
+  }
+  .hero h1 em { font-style:normal; color:var(--v2); }
+
+  .hero-lead {
+    font-size:16px; color:var(--text-mid); max-width:560px;
+    line-height:1.85; margin-bottom:36px;
+  }
+
+  .prereq-box {
+    background:var(--s1); border:1px solid rgba(245,166,35,.25);
+    border-radius:10px; padding:16px 20px;
+    display:flex; gap:12px; align-items:flex-start;
+    font-size:13.5px; color:#e0c070; max-width:560px;
+    margin-bottom:32px;
+  }
+  .prereq-box a { color:var(--v2); text-decoration:none; }
+  .prereq-box a:hover { text-decoration:underline; }
+
+  /* SECTIONS */
+  .section { padding:72px 60px; border-bottom:1px solid var(--border); }
+  .section-inner { max-width:800px; margin:0 auto; }
+  .eyebrow { font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+  .section-h { font-size:clamp(20px,3vw,30px); font-weight:800; color:var(--white); line-height:1.3; margin-bottom:24px; }
+
+  /* CONCEPT COMPARE */
+  .concept-compare {
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px;
+  }
+  .concept-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:22px 24px;
+  }
+  .concept-card.highlight { border-color:rgba(62,207,202,.3); }
+  .concept-tag {
+    font-size:10px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .concept-card:not(.highlight) .concept-tag { color:var(--text-dim); }
+  .concept-card.highlight .concept-tag { color:var(--v2); }
+  .concept-title { font-size:15px; font-weight:800; color:var(--white); margin-bottom:10px; }
+  .concept-desc { font-size:13.5px; color:var(--text-mid); line-height:1.75; }
+
+  /* FLOW DIAGRAM */
+  .flow-container {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:14px; padding:32px 28px; margin:24px 0;
+  }
+  .flow-title {
+    font-size:12px; font-weight:700; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--text-dim); margin-bottom:24px;
+  }
+  .flow-row {
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .flow-node {
+    background:var(--s2); border:1px solid var(--border2);
+    border-radius:8px; padding:8px 16px;
+    font-size:13px; font-weight:600; color:var(--text);
+    white-space:nowrap;
+  }
+  .flow-node.leader { border-color:var(--v2); color:var(--v2); }
+  .flow-node.team { border-color:var(--v1); color:var(--v1); }
+  .flow-node.comm { border-color:rgba(108,99,245,.4); color:var(--text-mid); font-weight:400; font-size:12px; }
+  .flow-arrow { color:var(--text-dim); font-size:14px; }
+  .flow-arrow-down { color:var(--text-dim); font-size:14px; text-align:center; margin:8px 0; }
+
+  /* PROMPT */
+  .prompt-box { background:#060609; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:12px 0; }
+  .prompt-top {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; background:var(--s2); border-bottom:1px solid var(--border);
+  }
+  .prompt-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+  .copy-btn {
+    background:transparent; border:1px solid var(--border2);
+    color:var(--text-dim); font-size:11px; padding:3px 10px;
+    border-radius:4px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all .15s;
+  }
+  .copy-btn:hover { border-color:var(--v2); color:var(--v2); }
+  .copy-btn.copied { border-color:var(--v2); color:var(--v2); }
+  .prompt-code {
+    padding:14px 16px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; color:#a0aac8; line-height:1.85;
+    white-space:pre-wrap; word-break:break-word;
+  }
+
+  /* CALLOUT */
+  .callout { border-radius:8px; padding:12px 16px; margin:12px 0; font-size:13.5px; line-height:1.7; display:flex; gap:10px; }
+  .tip { background:rgba(62,207,202,.07); border:1px solid rgba(62,207,202,.18); color:#70d8d0; }
+  .warn { background:rgba(245,90,90,.07); border:1px solid rgba(245,90,90,.18); color:#e09090; }
+  .info { background:rgba(108,99,245,.07); border:1px solid rgba(108,99,245,.18); color:#a098f0; }
+  .note { background:rgba(245,166,35,.07); border:1px solid rgba(245,166,35,.18); color:#d4a843; }
+
+  /* SETUP STEPS */
+  .setup-steps { display:flex; flex-direction:column; gap:12px; }
+  .setup-step {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; overflow:hidden;
+  }
+  .step-header {
+    display:flex; align-items:center; gap:14px;
+    padding:18px 22px; cursor:pointer; transition:background .15s;
+  }
+  .step-header:hover { background:var(--s2); }
+  .step-num {
+    width:32px; height:32px; border-radius:8px;
+    background:var(--s2); border:1px solid var(--border2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:var(--v2); flex-shrink:0;
+  }
+  .step-title { font-size:15px; font-weight:700; color:var(--white); }
+  .step-arrow { margin-left:auto; color:var(--text-dim); font-size:12px; transition:transform .2s; }
+  .setup-step.open .step-arrow { transform:rotate(90deg); }
+  .step-body { padding:0 22px 22px; display:none; }
+  .setup-step.open .step-body { display:block; }
+
+  /* EXAMPLE PROJECT */
+  .project-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;
+  }
+  .project-card {
+    background:var(--s2); border:1px solid var(--border);
+    border-radius:10px; padding:16px 20px;
+  }
+  .project-team {
+    font-size:11px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:8px;
+  }
+  .project-task {
+    font-size:13px; color:var(--text-mid); line-height:1.7;
+  }
+
+  /* COMM ARROWS */
+  .comm-grid {
+    display:flex; flex-direction:column; gap:10px; margin:16px 0;
+  }
+  .comm-row {
+    background:var(--s2); border:1px solid var(--border);
+    border-radius:8px; padding:12px 18px;
+    display:flex; align-items:center; gap:12px;
+    font-size:13px;
+  }
+  .comm-from { font-weight:700; color:var(--v1); white-space:nowrap; min-width:80px; }
+  .comm-arrow { color:var(--text-dim); }
+  .comm-to { font-weight:700; color:var(--v2); white-space:nowrap; min-width:80px; }
+  .comm-msg { color:var(--text-mid); font-size:12.5px; }
+
+  /* COST TABLE */
+  .cost-table { width:100%; border-collapse:collapse; font-size:13.5px; margin:16px 0; }
+  .cost-table th {
+    text-align:left; padding:10px 16px; font-size:11px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim);
+    border-bottom:1px solid var(--border);
+  }
+  .cost-table td {
+    padding:10px 16px; border-bottom:1px solid rgba(38,38,58,.5); color:var(--text-mid);
+  }
+  .cost-table tr:last-child td { border-bottom:none; }
+
+  /* DECISION TABLE */
+  .decision-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0;
+  }
+  .decision-card {
+    background:var(--s1); border:1px solid var(--border);
+    border-radius:12px; padding:22px 24px;
+  }
+  .decision-card.yes { border-color:rgba(62,207,142,.3); }
+  .decision-card.no { border-color:rgba(245,90,90,.2); }
+  .decision-label {
+    font-size:11px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; margin-bottom:12px;
+  }
+  .decision-card.yes .decision-label { color:var(--green); }
+  .decision-card.no .decision-label { color:var(--red); }
+  .decision-list {
+    list-style:none; font-size:13.5px; color:var(--text-mid); line-height:2;
+  }
+  .decision-list li::before { margin-right:8px; }
+  .decision-card.yes .decision-list li::before { content:'O'; color:var(--green); font-weight:700; }
+  .decision-card.no .decision-list li::before { content:'X'; color:var(--red); font-weight:700; }
+
+  /* AUTHOR */
+  .author-section {
+    padding:60px; text-align:center;
+    background:linear-gradient(180deg,var(--bg) 0%,var(--s1) 100%);
+  }
+  .author-inner { max-width:480px; margin:0 auto; }
+  .author-name { font-size:18px; font-weight:900; color:var(--white); margin-bottom:4px; }
+  .author-role { font-size:13px; color:var(--text-dim); margin-bottom:16px; }
+  .author-desc { font-size:14px; color:var(--text-mid); line-height:1.85; }
+
+  @media (max-width:700px) {
+    .hero { padding:80px 24px 60px; }
+    .section { padding:48px 24px; }
+    .concept-compare, .project-grid, .decision-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<nav id="nav">
+  <div class="nav-brand">3단계 — AI 팀 협업</div>
+  <a class="nav-back" href="subagent-guide.html">&larr; 2단계로</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="series-nav">
+      <span class="series-item done">1단계 &middot; 기본 세팅</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item done">2단계 &middot; AI 팀 구성</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item current">3단계 &middot; 팀 협업</span>
+      <span class="series-arrow">&rarr;</span>
+      <span class="series-item upcoming">4단계 &middot; MCP 연동</span>
+    </div>
+
+    <h1>AI 팀이 <em>동시에</em> 일하게 하기</h1>
+
+    <div class="hero-lead">
+      2단계에서 만든 7개 팀은 하나씩 따로 일했습니다.<br>
+      이제 하나의 프로젝트를 던지면 여러 팀이 동시에 움직이고,<br>
+      팀끼리 직접 소통까지 합니다.
+    </div>
+
+    <div class="prereq-box">
+      <span>&#9888;&#65039;</span>
+      <div>
+        <strong style="display:block;margin-bottom:4px;">시작 전 확인</strong>
+        <a href="subagent-guide.html">2단계 — 서브 에이전트 설치</a>가 완료된 상태여야 합니다.<br>
+        Agent Teams는 <strong>실험적 기능</strong>입니다. 토큰 비용이 높으니 꼭 비용 섹션을 읽고 진행하세요.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 개념 비교 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">개념 이해</div>
+    <div class="section-h">2단계 vs 3단계 — 뭐가 다른가</div>
+
+    <div class="concept-compare">
+      <div class="concept-card">
+        <div class="concept-tag">2단계 &middot; 서브에이전트</div>
+        <div class="concept-title">대표가 한 명씩 지시</div>
+        <div class="concept-desc">
+          대표(나) &rarr; 리서치팀에 지시<br>
+          결과 받음 &rarr; 기획팀에 지시<br>
+          결과 받음 &rarr; 법무팀에 지시<br><br>
+          <strong style="color:var(--white);">순차 처리.</strong> 한 번에 한 팀만 일함.
+        </div>
+      </div>
+      <div class="concept-card highlight">
+        <div class="concept-tag">3단계 &middot; Agent Teams</div>
+        <div class="concept-title">프로젝트 하나에 전 팀이 동시 투입</div>
+        <div class="concept-desc">
+          대표(나) &rarr; "AI 어시스턴트 도입해"<br>
+          &rarr; 리서치팀 + 기획팀 + 법무팀 + IR팀 <strong style="color:var(--v2);">동시 시작</strong><br>
+          &rarr; 팀끼리 직접 소통하며 결과 조율<br><br>
+          <strong style="color:var(--white);">병렬 처리.</strong> 모든 팀이 동시에 일함.
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:14px;color:var(--text-mid);line-height:1.85;">
+      비유하면 이렇습니다. 2단계는 팀원들에게 하나씩 업무를 지시하고 <strong style="color:var(--white);">마이크로매니징</strong>을 해야 했다면,
+      3단계는 <strong style="color:var(--white);">중간 관리자</strong>에게 프로젝트를 던지면 팀원들에게 알아서 역할을 분배하고 서로 대화하며 일하게 됩니다.
+    </div>
+
+    <!-- 구조 다이어그램 -->
+    <div class="flow-container">
+      <div class="flow-title">Agent Teams 작동 구조</div>
+
+      <div class="flow-row" style="justify-content:center;margin-bottom:24px;">
+        <div class="flow-node leader" style="font-size:15px;padding:10px 24px;">나 (대표)</div>
+      </div>
+
+      <div class="flow-arrow-down">&#8595; "AI 어시스턴트 도입 프로젝트 진행해"</div>
+
+      <div class="flow-row" style="justify-content:center;margin-bottom:20px;">
+        <div class="flow-node leader">Claude (팀 리더)</div>
+      </div>
+
+      <div class="flow-arrow-down">&#8595; 작업 분배 + 공유 작업 목록 생성</div>
+
+      <div class="flow-row" style="justify-content:center;gap:8px;">
+        <div class="flow-node team">리서치팀</div>
+        <div class="flow-node team">기획팀</div>
+        <div class="flow-node team">법무팀</div>
+        <div class="flow-node team">IR팀</div>
+        <div class="flow-node team">커뮤니케이션팀</div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px;">
+        <div class="flow-node comm" style="display:inline-block;">팀원끼리 직접 메시지 교환 가능</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 세팅 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">세팅</div>
+    <div class="section-h">Agent Teams 활성화하기</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:24px;line-height:1.85;">
+      Agent Teams는 실험적 기능이라 기본적으로 꺼져 있습니다. 한 줄만 추가하면 켜집니다.
+    </p>
+
+    <div class="setup-steps">
+      <div class="setup-step open">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num">1</div>
+          <div class="step-title">settings.json에 환경변수 추가</div>
+          <div class="step-arrow">&#9654;</div>
+        </div>
+        <div class="step-body">
+          <p style="font-size:13.5px;color:var(--text-mid);margin-bottom:14px;line-height:1.75;">
+            Claude Code 대화창에 아래를 그대로 붙여넣으세요. 자동으로 설정 파일을 수정합니다.
+          </p>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,'~/.claude/settings.json 파일에 env 항목을 추가해줘.\n\nCLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 값을 \"1\"로 설정해.\n기존 설정은 유지하고 env만 추가하면 돼.')">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/settings.json 파일에 env 항목을 추가해줘.
+
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 값을 "1"로 설정해.
+기존 설정은 유지하고 env만 추가하면 돼.</div>
+          </div>
+
+          <div style="font-size:13px;color:var(--text-dim);margin-top:12px;line-height:1.7;">
+            완료되면 settings.json이 이렇게 됩니다:
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">settings.json 결과</div>
+            </div>
+            <div class="prompt-code">{
+  "permissions": {
+    "defaultMode": "plan"
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num">2</div>
+          <div class="step-title">Claude Code 재시작</div>
+          <div class="step-arrow">&#9654;</div>
+        </div>
+        <div class="step-body">
+          <p style="font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+            설정을 적용하려면 Claude Code를 한 번 재시작해야 합니다.<br>
+            VSCode 기준: Claude Code 패널을 닫았다 다시 열면 됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num">3</div>
+          <div class="step-title">확인 — 작동 테스트</div>
+          <div class="step-arrow">&#9654;</div>
+        </div>
+        <div class="step-body">
+          <p style="font-size:13.5px;color:var(--text-mid);margin-bottom:14px;line-height:1.75;">
+            아래 프롬프트를 입력해서 Agent Teams가 활성화되었는지 확인하세요.
+          </p>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">테스트 프롬프트</div>
+              <button class="copy-btn" onclick="cp(this,'간단한 테스트야. 리서치팀과 기획팀 2개 팀을 동시에 실행해줘.\n\n리서치팀: 국내 AI 어시스턴트 시장 규모 조사 (3줄 요약만)\n기획팀: AI 어시스턴트 핵심 기능 3가지 리스트업\n\n각 팀이 병렬로 동시에 실행되는지 확인하고 싶어.')">복사</button>
+            </div>
+            <div class="prompt-code">간단한 테스트야. 리서치팀과 기획팀 2개 팀을 동시에 실행해줘.
+
+리서치팀: 국내 AI 어시스턴트 시장 규모 조사 (3줄 요약만)
+기획팀: AI 어시스턴트 핵심 기능 3가지 리스트업
+
+각 팀이 병렬로 동시에 실행되는지 확인하고 싶어.</div>
+          </div>
+          <div class="callout tip">
+            <span>&#128161;</span>
+            <div>여러 팀이 동시에 실행되면서 결과가 각각 돌아오면 성공입니다. 순차적으로 하나씩 실행되면 활성화가 안 된 것이니 1번부터 다시 확인하세요.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 호출 방법 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">호출 방법</div>
+    <div class="section-h">1팀만 부를 때 vs 팀 프로젝트를 돌릴 때</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:24px;line-height:1.85;">
+      Agent Teams를 켰다고 해서 항상 여러 팀이 동시에 움직이는 건 아닙니다.<br>
+      <strong style="color:var(--white);">부르는 방식이 다릅니다.</strong> 상황에 맞게 쓰세요.
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- 케이스 1: 1팀만 -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(108,99,245,.15);border:1px solid rgba(108,99,245,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">1</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">팀 하나만 부르기</div>
+            <div style="font-size:12px;color:var(--text-dim);">2단계와 동일 &middot; 추가 비용 없음</div>
+          </div>
+        </div>
+        <div style="padding:18px 22px;">
+          <div style="font-size:13px;color:var(--text-mid);margin-bottom:14px;line-height:1.75;">
+            간단한 작업은 굳이 팀 프로젝트를 돌릴 필요 없습니다. 2단계처럼 한 팀만 불러서 쓰면 됩니다.
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--v2);margin-bottom:10px;letter-spacing:.08em;">호출 방법 3가지</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--v1);min-width:60px;">@멘션</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-mid);">
+                <span style="color:var(--v2);">@research-team</span> 국내 프롭테크 시장 현황 분석해줘
+              </div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--v1);min-width:60px;">자연어</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-mid);">
+                리서치팀한테 시켜서 경쟁사 분석 좀 해줘
+              </div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--v1);min-width:60px;">/스킬</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-mid);">
+                <span style="color:var(--v2);">/research</span> 국내 전자세금계산서 API 업체 비교
+              </div>
+            </div>
+          </div>
+          <div class="callout tip" style="margin-top:14px;">
+            <span>&#128161;</span>
+            <div>이메일 하나, 리서치 하나, 계약서 하나 — 이런 단일 작업은 이 방식이 빠르고 저렴합니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 케이스 2: 팀 프로젝트 -->
+      <div style="background:var(--s1);border:1px solid rgba(62,207,202,.25);border-radius:12px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(62,207,202,.15);border:1px solid rgba(62,207,202,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">+</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">팀 프로젝트 돌리기</div>
+            <div style="font-size:12px;color:var(--v2);">3단계 Agent Teams &middot; 여러 팀 동시 투입</div>
+          </div>
+        </div>
+        <div style="padding:18px 22px;">
+          <div style="font-size:13px;color:var(--text-mid);margin-bottom:14px;line-height:1.75;">
+            여러 팀의 결과물이 서로 영향을 줄 때 사용합니다. "동시에", "팀 구성", "프로젝트" 같은 키워드가 트리거입니다.
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--v2);margin-bottom:10px;letter-spacing:.08em;">호출 방법 2가지</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;">
+              <div style="font-size:11px;font-weight:700;color:var(--v2);margin-bottom:6px;">팀 직접 지정</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-mid);line-height:1.7;">
+                AI 어시스턴트 도입하려고 해.<br>
+                <span style="color:var(--v2);">리서치팀, 기획팀, 법무팀을 동시에 투입</span>해줘.<br>
+                [각 팀별 작업 내용]
+              </div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;">
+              <div style="font-size:11px;font-weight:700;color:var(--v3);margin-bottom:6px;">Claude에게 팀 구성 맡기기</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-mid);line-height:1.7;">
+                AI 어시스턴트 도입하려는데,<br>
+                <span style="color:var(--v3);">어떤 팀이 필요할지 판단해서 팀 구성</span>하고 진행해줘.<br>
+                구성안 먼저 보여주고, 내가 확인하면 실행해.
+              </div>
+            </div>
+          </div>
+          <div class="callout warn" style="margin-top:14px;">
+            <span>&#9888;&#65039;</span>
+            <div>팀 프로젝트는 팀 수만큼 비용이 곱해집니다. 단일 작업에는 쓰지 마세요.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 판단 기준 한줄 -->
+    <div style="background:rgba(62,207,202,.07);border:1px solid rgba(62,207,202,.18);border-radius:10px;padding:16px 22px;margin-top:20px;font-size:14px;color:#70d8d0;line-height:1.8;">
+      <strong style="color:var(--white);">한줄 판단:</strong> "이 작업에 팀 2개 이상의 결과물이 서로 필요한가?" &rarr; Yes면 팀 프로젝트, No면 1팀만 호출.
+    </div>
+  </div>
+</section>
+
+<!-- 작동 방식 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">작동 방식</div>
+    <div class="section-h">팀 프로젝트는 실제로 어떻게 돌아가나</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:24px;line-height:1.85;">
+      Agent Teams를 켜면, 프로젝트를 던졌을 때 Claude가 <strong style="color:var(--white);">중간 관리자</strong> 역할을 합니다.<br>
+      단, 모든 것이 자동은 아닙니다. 아래 3단계를 거칩니다.
+    </p>
+
+    <!-- 3단계 흐름 -->
+    <div style="display:flex;flex-direction:column;gap:0;">
+
+      <!-- Step A -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px 12px 0 0;padding:24px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(108,99,245,.15);border:1px solid rgba(108,99,245,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--v1);flex-shrink:0;">A</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">나: 프로젝트를 던진다</div>
+            <div style="font-size:12px;color:var(--text-dim);">팀을 직접 지정해도 되고, 안 해도 됩니다</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;">
+            <div style="font-size:11px;font-weight:700;color:var(--v2);margin-bottom:6px;letter-spacing:.08em;">방법 1 &middot; 팀 직접 지정</div>
+            <div style="font-size:12.5px;color:var(--text-mid);line-height:1.7;font-family:'JetBrains Mono',monospace;">
+              "AI 어시스턴트 도입해줘.<br>리서치팀, 기획팀, 법무팀<br>동시에 투입해."
+            </div>
+          </div>
+          <div style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;">
+            <div style="font-size:11px;font-weight:700;color:var(--v3);margin-bottom:6px;letter-spacing:.08em;">방법 2 &middot; Claude에게 맡기기</div>
+            <div style="font-size:12.5px;color:var(--text-mid);line-height:1.7;font-family:'JetBrains Mono',monospace;">
+              "AI 어시스턴트 도입하려는데,<br>어떤 팀이 필요할지 판단해서<br>팀 구성하고 진행해줘."
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="background:var(--s1);border-left:1px solid var(--border);border-right:1px solid var(--border);padding:8px 0;text-align:center;">
+        <span style="color:var(--text-dim);font-size:14px;">&#8595;</span>
+      </div>
+
+      <!-- Step B -->
+      <div style="background:var(--s1);border:1px solid var(--border);padding:24px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(62,207,202,.15);border:1px solid rgba(62,207,202,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--v2);flex-shrink:0;">B</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">Claude: 팀 구성을 제안한다</div>
+            <div style="font-size:12px;color:var(--text-dim);">사용자 승인 전까지 실행하지 않습니다</div>
+          </div>
+        </div>
+        <div style="background:#060609;border:1px solid var(--border);border-radius:8px;padding:16px 18px;font-size:13px;color:var(--text-mid);line-height:1.85;">
+          <div style="font-size:11px;font-weight:700;color:var(--v2);margin-bottom:8px;letter-spacing:.08em;">CLAUDE 응답 예시</div>
+          <span style="color:var(--white);">"이 프로젝트에 다음 팀을 투입하면 좋겠습니다:</span><br><br>
+          &nbsp;&nbsp;1. <strong style="color:var(--v1);">리서치팀</strong> — AI 솔루션 시장 조사 + 비용 비교<br>
+          &nbsp;&nbsp;2. <strong style="color:var(--v1);">기획팀</strong> — 기능 PRD + 사용자 시나리오<br>
+          &nbsp;&nbsp;3. <strong style="color:var(--v1);">법무팀</strong> — 개인정보보호법 + 이용약관 검토<br><br>
+          <span style="color:var(--white);">리서치팀 결과를 기획팀과 법무팀이 참고하도록 하겠습니다.<br>이대로 진행할까요?"</span>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="background:var(--s1);border-left:1px solid var(--border);border-right:1px solid var(--border);padding:8px 0;text-align:center;">
+        <span style="color:var(--text-dim);font-size:14px;">&#8595;</span>
+      </div>
+
+      <!-- Step C -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:24px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(62,207,142,.15);border:1px solid rgba(62,207,142,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--green);flex-shrink:0;">C</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">나: "응" &rarr; 이후는 자동</div>
+            <div style="font-size:12px;color:var(--text-dim);">승인 후에는 팀 운영이 자동으로 돌아갑니다</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div style="background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.2);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--green);font-weight:600;">작업 분배 자동</div>
+          <div style="background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.2);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--green);font-weight:600;">팀 간 소통 자동</div>
+          <div style="background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.2);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--green);font-weight:600;">의존성 관리 자동</div>
+          <div style="background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.2);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--green);font-weight:600;">완료 알림 자동</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip" style="margin-top:20px;">
+      <span>&#128161;</span>
+      <div>
+        <strong>핵심:</strong> 팀 투입 결정은 내가 한다. 투입 이후 운영은 Claude가 한다.<br>
+        즉, "어떤 팀이 필요한지"는 판단해야 하지만 "팀끼리 어떻게 일할지"는 신경 쓸 필요 없습니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 나만의 팀 조합 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">팀 조합 설계</div>
+    <div class="section-h">내 업무에 맞는 팀을 직접 조합하세요</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:8px;line-height:1.85;">
+      모든 프로젝트에 7개 팀을 전부 넣을 필요는 없습니다.<br>
+      업무 성격에 따라 <strong style="color:var(--white);">필요한 팀만 골라서</strong> 조합하는 것이 비용도 아끼고 결과도 좋습니다.
+    </p>
+
+    <!-- 추천 조합 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:28px 0 14px;">업무별 추천 팀 조합</div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th style="width:25%;">업무 유형</th>
+            <th style="width:45%;">추천 팀 조합</th>
+            <th style="width:30%;">왜 이 조합인가</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">신규 기능 기획</td>
+            <td><span style="color:var(--v1);">리서치</span> + <span style="color:var(--v2);">기획</span> + <span style="color:var(--v3);">법무</span></td>
+            <td>시장 근거 &rarr; PRD 반영 &rarr; 규제 체크</td>
+          </tr>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">투자 라운드</td>
+            <td><span style="color:var(--v1);">리서치</span> + <span style="color:var(--red);">IR</span> + <span style="color:var(--v3);">법무</span> + <span style="color:var(--green);">회계</span></td>
+            <td>시장 데이터 &rarr; IR 자료 &rarr; 계약 검토 &rarr; 재무 정리</td>
+          </tr>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">파트너십 검토</td>
+            <td><span style="color:var(--v1);">리서치</span> + <span style="color:var(--v3);">법무</span> + <span style="color:var(--green);">커뮤니케이션</span></td>
+            <td>상대방 조사 &rarr; 계약 리스크 &rarr; 회신 이메일</td>
+          </tr>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">채용 프로젝트</td>
+            <td><span style="color:var(--v2);">기획</span> + <span style="color:var(--red);">인사</span> + <span style="color:var(--green);">커뮤니케이션</span></td>
+            <td>JD 설계 &rarr; 계약서/온보딩 &rarr; 채용 공고</td>
+          </tr>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">분기 리뷰</td>
+            <td><span style="color:var(--green);">회계</span> + <span style="color:var(--red);">IR</span> + <span style="color:var(--v1);">리서치</span></td>
+            <td>손익 정리 &rarr; 투자자 업데이트 &rarr; 시장 변화 반영</td>
+          </tr>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">신규 시장 진출</td>
+            <td><span style="color:var(--v1);">리서치</span> + <span style="color:var(--v2);">기획</span> + <span style="color:var(--v3);">법무</span> + <span style="color:var(--red);">IR</span></td>
+            <td>시장 분석 &rarr; 진출 전략 &rarr; 규제 확인 &rarr; 투자자 설득</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 직접 설계 템플릿 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:36px 0 10px;">직접 설계하기 — 빈칸 템플릿</div>
+    <p style="font-size:13.5px;color:var(--text-mid);margin-bottom:16px;line-height:1.75;">
+      아래 템플릿의 <strong style="color:var(--v3);">[빈칸]</strong>만 채워서 Claude Code에 붙여넣으면 됩니다.<br>
+      어떤 프로젝트든 이 구조로 팀을 조합할 수 있습니다.
+    </p>
+
+    <div class="prompt-box">
+      <div class="prompt-top">
+        <div class="prompt-label">범용 팀 조합 템플릿</div>
+        <button class="copy-btn" onclick="cp(this,'[프로젝트 이름/목표]를 진행하려고 해. 아래 팀별로 동시에 작업해줘.\n\n[팀 이름 1]: [이 팀이 해야 할 구체적 작업]\n[팀 이름 2]: [이 팀이 해야 할 구체적 작업]\n[팀 이름 3]: [이 팀이 해야 할 구체적 작업]\n\n팀 간 소통 규칙:\n- [팀 A] 결과를 [팀 B]가 참고해서 작업할 것\n- [팀 C]는 [팀 B] 작업에 법적/규제 피드백을 줄 것\n- 각 팀은 다른 팀에 필요한 데이터가 있으면 직접 공유해')">복사</button>
+      </div>
+      <div class="prompt-code"><span style="color:#f5a623;">[프로젝트 이름/목표]</span>를 진행하려고 해. 아래 팀별로 동시에 작업해줘.
+
+<span style="color:#f5a623;">[팀 이름 1]</span>: <span style="color:#f5a623;">[이 팀이 해야 할 구체적 작업]</span>
+<span style="color:#f5a623;">[팀 이름 2]</span>: <span style="color:#f5a623;">[이 팀이 해야 할 구체적 작업]</span>
+<span style="color:#f5a623;">[팀 이름 3]</span>: <span style="color:#f5a623;">[이 팀이 해야 할 구체적 작업]</span>
+
+팀 간 소통 규칙:
+- <span style="color:#f5a623;">[팀 A]</span> 결과를 <span style="color:#f5a623;">[팀 B]</span>가 참고해서 작업할 것
+- <span style="color:#f5a623;">[팀 C]</span>는 <span style="color:#f5a623;">[팀 B]</span> 작업에 법적/규제 피드백을 줄 것
+- 각 팀은 다른 팀에 필요한 데이터가 있으면 직접 공유해</div>
+    </div>
+
+    <!-- Claude에게 맡기는 버전 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:28px 0 10px;">잘 모르겠으면? Claude에게 팀 구성까지 맡기기</div>
+    <p style="font-size:13.5px;color:var(--text-mid);margin-bottom:16px;line-height:1.75;">
+      어떤 팀이 필요한지 감이 안 올 때는, 프로젝트만 설명하고 팀 구성을 Claude에게 위임할 수 있습니다.
+    </p>
+
+    <div class="prompt-box">
+      <div class="prompt-top">
+        <div class="prompt-label">팀 구성 위임 템플릿</div>
+        <button class="copy-btn" onclick="cp(this,'[프로젝트 설명 1~2문장]\n\n우리 팀에는 리서치팀, 기획팀, 법무팀, IR팀, 커뮤니케이션팀, 회계팀, 인사팀이 있어.\n이 프로젝트에 어떤 팀들을 투입해야 할지 판단해서 팀을 구성하고,\n각 팀의 구체적 작업과 팀 간 소통 방식까지 설계해줘.\n\n팀 구성안을 먼저 보여주고, 내가 확인하면 실행해.')">복사</button>
+      </div>
+      <div class="prompt-code"><span style="color:#f5a623;">[프로젝트 설명 1~2문장]</span>
+
+우리 팀에는 리서치팀, 기획팀, 법무팀, IR팀, 커뮤니케이션팀, 회계팀, 인사팀이 있어.
+이 프로젝트에 어떤 팀들을 투입해야 할지 판단해서 팀을 구성하고,
+각 팀의 구체적 작업과 팀 간 소통 방식까지 설계해줘.
+
+팀 구성안을 먼저 보여주고, 내가 확인하면 실행해.</div>
+    </div>
+
+    <div class="callout note" style="margin-top:16px;">
+      <span>&#128218;</span>
+      <div>
+        <strong>팁:</strong> 마지막 줄 "팀 구성안을 먼저 보여주고, 내가 확인하면 실행해"가 중요합니다.
+        이 문장이 없으면 Claude가 바로 실행해버릴 수 있어요. 비용 통제를 위해 반드시 확인 단계를 넣으세요.
+      </div>
+    </div>
+
+    <!-- 7개 팀 레퍼런스 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:36px 0 14px;">우리 팀 목록 (2단계에서 만든 7개)</div>
+    <p style="font-size:13.5px;color:var(--text-mid);margin-bottom:14px;line-height:1.75;">
+      팀 조합할 때 참고하세요. 각 팀이 어떤 일을 하는지 한눈에 보입니다.
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid var(--v1);">
+        <div style="font-size:12px;font-weight:800;color:var(--v1);margin-bottom:4px;">리서치팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">시장 조사, 경쟁사 분석, 투자 동향</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid var(--v2);">
+        <div style="font-size:12px;font-weight:800;color:var(--v2);margin-bottom:4px;">기획팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">PRD, 기능 스펙, 로드맵</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid var(--v3);">
+        <div style="font-size:12px;font-weight:800;color:var(--v3);margin-bottom:4px;">법무팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">계약서 검토, 리스크 분류, 규제 확인</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid var(--red);">
+        <div style="font-size:12px;font-weight:800;color:var(--red);margin-bottom:4px;">IR팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">투자자 문서, 1-pager, VC 미팅 자료</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid var(--green);">
+        <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:4px;">커뮤니케이션팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">이메일, 파트너 소통, 고객 안내</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid #e080e0;">
+        <div style="font-size:12px;font-weight:800;color:#e080e0;margin-bottom:4px;">회계팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">지출 분류, 손익, 세무 자료</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left:3px solid #80b0e0;grid-column:1/-1;">
+        <div style="font-size:12px;font-weight:800;color:#80b0e0;margin-bottom:4px;">인사팀</div>
+        <div style="font-size:12px;color:var(--text-dim);">채용 공고, 근로계약, 온보딩, 급여 대장, 4대보험</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 실전 예시 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">실전 예시</div>
+    <div class="section-h">프로젝트: AI 어시스턴트 도입</div>
+
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:8px;line-height:1.85;">
+      프롬프트 하나로 5개 팀이 동시에 움직이는 예시입니다.
+    </p>
+
+    <div class="prompt-box">
+      <div class="prompt-top">
+        <div class="prompt-label">프로젝트 프롬프트</div>
+        <button class="copy-btn" onclick="cp(this,'우리 제품에 AI 어시스턴트 기능을 도입하려고 해. 아래 팀별로 동시에 작업 시작해줘.\n\n리서치팀: 국내 AI 어시스턴트 솔루션 비교 (ChatGPT API vs Claude API vs 자체개발). 비용, 성능, 연동 난이도 기준.\n기획팀: AI 어시스턴트 기능 PRD 작성. 임차인 문의 자동응답, 관리비 안내, 계약 관련 FAQ가 핵심 기능.\n법무팀: AI 챗봇 도입 시 개인정보보호법 이슈 검토. 이용약관에 추가해야 할 조항 정리.\nIR팀: 투자자 업데이트에 넣을 AI 기능 도입 슬라이드 1장 초안.\n커뮤니케이션팀: 기존 고객(건물주)에게 보낼 새 기능 안내 이메일 초안.\n\n각 팀은 작업 중 다른 팀에 필요한 정보가 있으면 직접 공유해.')">복사</button>
+      </div>
+      <div class="prompt-code">우리 제품에 AI 어시스턴트 기능을 도입하려고 해. 아래 팀별로 동시에 작업 시작해줘.
+
+리서치팀: 국내 AI 어시스턴트 솔루션 비교 (ChatGPT API vs Claude API vs 자체개발). 비용, 성능, 연동 난이도 기준.
+기획팀: AI 어시스턴트 기능 PRD 작성. 임차인 문의 자동응답, 관리비 안내, 계약 관련 FAQ가 핵심 기능.
+법무팀: AI 챗봇 도입 시 개인정보보호법 이슈 검토. 이용약관에 추가해야 할 조항 정리.
+IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초안.
+커뮤니케이션팀: 기존 고객(건물주)에게 보낼 새 기능 안내 이메일 초안.
+
+각 팀은 작업 중 다른 팀에 필요한 정보가 있으면 직접 공유해.</div>
+    </div>
+
+    <!-- 각 팀 결과물 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:24px 0 12px;">각 팀이 동시에 수행하는 작업</div>
+
+    <div class="project-grid">
+      <div class="project-card" style="border-left:3px solid var(--v1);">
+        <div class="project-team" style="color:var(--v1);">리서치팀</div>
+        <div class="project-task">
+          ChatGPT API vs Claude API vs 자체개발<br>
+          비용/성능/연동 난이도 비교표 작성<br>
+          추천안 + 근거 제시
+        </div>
+      </div>
+      <div class="project-card" style="border-left:3px solid var(--v2);">
+        <div class="project-team" style="color:var(--v2);">기획팀</div>
+        <div class="project-task">
+          AI 어시스턴트 PRD 작성<br>
+          사용자 시나리오 3개<br>
+          Must Have / Nice to Have 분류
+        </div>
+      </div>
+      <div class="project-card" style="border-left:3px solid var(--v3);">
+        <div class="project-team" style="color:var(--v3);">법무팀</div>
+        <div class="project-task">
+          개인정보보호법 체크리스트<br>
+          이용약관 수정 포인트<br>
+          AI 생성 답변 면책 조항
+        </div>
+      </div>
+      <div class="project-card" style="border-left:3px solid var(--red);">
+        <div class="project-team" style="color:var(--red);">IR팀</div>
+        <div class="project-task">
+          투자자 업데이트 슬라이드<br>
+          "AI 도입 = 운영비 절감 + 서비스 차별화"<br>
+          핵심 지표 포함
+        </div>
+      </div>
+      <div class="project-card" style="border-left:3px solid var(--green);grid-column:1/-1;">
+        <div class="project-team" style="color:var(--green);">커뮤니케이션팀</div>
+        <div class="project-task">
+          고객(건물주) 대상 새 기능 안내 이메일 &middot; 제목 3개 옵션 + 본문 2버전
+        </div>
+      </div>
+    </div>
+
+    <!-- 팀 간 소통 -->
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin:28px 0 12px;">팀 간 직접 소통 — 이게 핵심 차이</div>
+    <p style="font-size:13.5px;color:var(--text-mid);margin-bottom:14px;line-height:1.75;">
+      2단계에서는 모든 정보가 대표(나)를 거쳐야 했습니다. Agent Teams에서는 팀끼리 직접 대화합니다.
+    </p>
+
+    <div class="comm-grid">
+      <div class="comm-row">
+        <span class="comm-from">리서치팀</span>
+        <span class="comm-arrow">&rarr;</span>
+        <span class="comm-to">기획팀</span>
+        <span class="comm-msg">"Claude API가 가성비 1순위. 건당 비용 데이터 공유합니다. PRD에 반영해주세요."</span>
+      </div>
+      <div class="comm-row">
+        <span class="comm-from">법무팀</span>
+        <span class="comm-arrow">&rarr;</span>
+        <span class="comm-to">기획팀</span>
+        <span class="comm-msg">"AI 응답에 '자동 생성된 답변입니다' 고지 문구 필수. PRD에 UI 요구사항으로 추가해주세요."</span>
+      </div>
+      <div class="comm-row">
+        <span class="comm-from">기획팀</span>
+        <span class="comm-arrow">&rarr;</span>
+        <span class="comm-to">커뮤니케이션팀</span>
+        <span class="comm-msg">"핵심 기능 3개 확정했습니다. 고객 이메일에 이 기능 리스트 반영해주세요."</span>
+      </div>
+      <div class="comm-row">
+        <span class="comm-from">리서치팀</span>
+        <span class="comm-arrow">&rarr;</span>
+        <span class="comm-to">IR팀</span>
+        <span class="comm-msg">"AI 도입 시 운영비 30% 절감 데이터 찾았습니다. 투자자 슬라이드에 넣으세요."</span>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span>&#128276;</span>
+      <div>이 소통은 자동으로 이루어집니다. 대표가 중간에서 전달할 필요 없이, 각 팀이 필요한 정보를 직접 주고받습니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 비용 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">비용 안내</div>
+    <div class="section-h">토큰 비용 — 반드시 읽고 넘어가세요</div>
+
+    <div class="callout warn" style="margin-bottom:24px;">
+      <span>&#9888;&#65039;</span>
+      <div>Agent Teams는 각 팀원이 <strong>독립적인 Claude 인스턴스</strong>로 실행됩니다. 팀원 수만큼 토큰 비용이 곱해집니다.</div>
+    </div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>방식</th>
+            <th>팀 3개 동시 실행 시</th>
+            <th>체감 비용</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">2단계 &middot; 서브에이전트</td>
+            <td>순차 실행 &rarr; 합산 1배</td>
+            <td style="color:var(--green);">기본</td>
+          </tr>
+          <tr>
+            <td style="color:var(--white);font-weight:600;">3단계 &middot; Agent Teams</td>
+            <td>병렬 실행 &rarr; 동시에 3배</td>
+            <td style="color:var(--v3);">3~5배</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;font-size:14px;font-weight:700;color:var(--white);margin-bottom:10px;">비용 관리 팁</div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">1. 팀원 수 제한</strong> &mdash; 한 프로젝트에 3~5개 팀이 적정. 7개 전부 동시 투입은 비용 대비 효과가 떨어집니다.
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">2. 단순 작업은 2단계로</strong> &mdash; "이메일 하나 써줘"는 서브에이전트면 충분합니다. Agent Teams는 여러 팀의 결과물이 서로 영향을 줄 때만 쓰세요.
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        <strong style="color:var(--white);">3. Pro/Max 플랜 권장</strong> &mdash; API 과금이 아닌 Claude Pro($20/월) 또는 Max($100/월) 요금제를 쓰면 토큰 걱정 없이 사용 가능합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 판단 기준 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">판단 기준</div>
+    <div class="section-h">Agent Teams를 쓸 때 vs 안 쓸 때</div>
+
+    <div class="decision-grid">
+      <div class="decision-card yes">
+        <div class="decision-label">Agent Teams가 효과적인 경우</div>
+        <ul class="decision-list">
+          <li>신규 기능 기획 (리서치+PRD+법무 동시)</li>
+          <li>투자 라운드 준비 (IR+리서치+커뮤니케이션)</li>
+          <li>신규 사업 검토 (시장조사+법무+재무 동시)</li>
+          <li>분기 리뷰 (회계+IR+기획 한번에)</li>
+          <li>팀 간 결과물이 서로 참조되어야 할 때</li>
+        </ul>
+      </div>
+      <div class="decision-card no">
+        <div class="decision-label">서브에이전트(2단계)로 충분한 경우</div>
+        <ul class="decision-list">
+          <li>이메일 한 통 작성</li>
+          <li>계약서 하나 검토</li>
+          <li>단일 주제 리서치</li>
+          <li>PRD 하나 작성</li>
+          <li>팀 간 연결이 필요 없는 독립 작업</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span>&#128218;</span>
+      <div>
+        <strong>정리:</strong> 프로젝트 하나에 2개 팀 이상의 결과물이 서로 영향을 주면 Agent Teams.
+        독립 작업이면 서브에이전트. 대부분의 일상 업무는 서브에이전트로 충분합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 추가 프로젝트 예시 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">응용</div>
+    <div class="section-h">이런 프로젝트에도 쓸 수 있습니다</div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <!-- 예시 1 -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+          <div style="font-size:18px;">&#128176;</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">시리즈 A 라운드 준비</div>
+            <div style="font-size:12px;color:var(--text-dim);">리서치 + IR + 법무 + 회계</div>
+          </div>
+        </div>
+        <div class="prompt-box" style="margin:0;border:none;border-radius:0;">
+          <div class="prompt-top">
+            <div class="prompt-label">프롬프트</div>
+            <button class="copy-btn" onclick="cp(this,'시리즈 A 라운드 준비를 시작하려고 해. 아래 팀별로 동시에 작업해줘.\n\n리서치팀: 국내 프롭테크 최근 투자 동향 (2024-2026). 유사 스테이지 투자 사례 5건.\nIR팀: 투자자 1-pager 초안. TAM/SAM/SOM + 핵심 지표 + 투자 요청 내용.\n법무팀: 투자계약서(SAFE/전환사채) 주요 조항 체크리스트. 창업자 불리 조항 리스트.\n회계팀: 최근 6개월 손익 요약 + 번레이트 계산 + 런웨이 몇 개월인지.\n\n각 팀은 다른 팀에 필요한 데이터 있으면 직접 공유해.')">복사</button>
+          </div>
+          <div class="prompt-code">시리즈 A 라운드 준비를 시작하려고 해. 아래 팀별로 동시에 작업해줘.
+
+리서치팀: 국내 프롭테크 최근 투자 동향 (2024-2026). 유사 스테이지 투자 사례 5건.
+IR팀: 투자자 1-pager 초안. TAM/SAM/SOM + 핵심 지표 + 투자 요청 내용.
+법무팀: 투자계약서(SAFE/전환사채) 주요 조항 체크리스트. 창업자 불리 조항 리스트.
+회계팀: 최근 6개월 손익 요약 + 번레이트 계산 + 런웨이 몇 개월인지.
+
+각 팀은 다른 팀에 필요한 데이터 있으면 직접 공유해.</div>
+        </div>
+      </div>
+
+      <!-- 예시 2 -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+          <div style="font-size:18px;">&#127981;</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--white);">신규 B2B 파트너십 검토</div>
+            <div style="font-size:12px;color:var(--text-dim);">리서치 + 법무 + 기획 + 커뮤니케이션</div>
+          </div>
+        </div>
+        <div class="prompt-box" style="margin:0;border:none;border-radius:0;">
+          <div class="prompt-top">
+            <div class="prompt-label">프롬프트</div>
+            <button class="copy-btn" onclick="cp(this,'A사에서 API 연동 파트너십 제안이 왔어. 검토해줘.\n\n리서치팀: A사 회사 정보, 재무 상태, 시장 평판 조사.\n법무팀: 파트너십 계약 시 주의할 조항 (독점, 책임, 해지, 데이터 소유권).\n기획팀: API 연동 시 우리 제품에 미치는 영향, 기능 변경 필요 사항 정리.\n커뮤니케이션팀: A사에 보낼 긍정적 회신 이메일 + 미팅 요청 초안.\n\n리서치팀 결과를 법무팀과 기획팀이 참고하도록 공유해.')">복사</button>
+          </div>
+          <div class="prompt-code">A사에서 API 연동 파트너십 제안이 왔어. 검토해줘.
+
+리서치팀: A사 회사 정보, 재무 상태, 시장 평판 조사.
+법무팀: 파트너십 계약 시 주의할 조항 (독점, 책임, 해지, 데이터 소유권).
+기획팀: API 연동 시 우리 제품에 미치는 영향, 기능 변경 필요 사항 정리.
+커뮤니케이션팀: A사에 보낼 긍정적 회신 이메일 + 미팅 요청 초안.
+
+리서치팀 결과를 법무팀과 기획팀이 참고하도록 공유해.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 다음 단계 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow">다음 단계</div>
+    <div class="section-h">3단계를 마쳤다면</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--s1);border:1px solid rgba(62,207,202,.25);border-radius:12px;padding:22px 24px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--v2);margin-bottom:8px;">완료</div>
+        <div style="font-size:15px;font-weight:800;color:var(--white);margin-bottom:8px;">1단계 + 2단계 + 3단계</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:14px;">
+          CLAUDE.md, Skills, 서브 에이전트, 그리고 Agent Teams까지 갖추었습니다.<br>
+          이제 프로젝트 단위로 AI 팀을 운용할 수 있는 상태입니다.
+        </div>
+        <div style="display:flex;gap:8px;">
+          <a href="index.html" style="display:inline-block;font-size:12px;font-weight:700;color:var(--v1);border:1px solid rgba(108,99,245,.3);padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s;">&larr; 1단계</a>
+          <a href="subagent-guide.html" style="display:inline-block;font-size:12px;font-weight:700;color:var(--green);border:1px solid rgba(62,207,142,.3);padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s;">&larr; 2단계</a>
+        </div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:22px 24px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">다음</div>
+        <div style="font-size:15px;font-weight:800;color:var(--white);margin-bottom:8px;">4단계 — MCP 연동</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.7;">Gmail, Notion, Slack 등 실제 쓰는 도구에 연결합니다. 작성 예정입니다.</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(108,99,245,.07);border:1px solid rgba(108,99,245,.18);border-radius:10px;padding:18px 22px;font-size:14px;color:#a098f0;line-height:1.8;">
+      <strong style="color:var(--white);display:block;margin-bottom:6px;">&#128204; 4단계 준비 중</strong>
+      MCP 연동(Gmail, Notion, Slack 등 외부 도구 연결) 가이드를 준비하고 있습니다.
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section class="author-section">
+  <div class="author-inner">
+    <div class="author-name">한상</div>
+    <div class="author-role">스타트업 대표이사</div>
+    <div class="author-desc">
+      서브 에이전트로 "팀"을 만들었다면,<br>
+      Agent Teams로 "팀워크"를 만들 수 있습니다.<br><br>
+      비용과 효과를 저울질하며 쓰는 것이 핵심입니다.<br>
+      모든 작업에 쓸 필요는 없고, 프로젝트 단위로 투입하세요.
+    </div>
+    <div style="margin-top:20px;display:inline-block;background:rgba(62,207,202,.1);border:1px solid rgba(62,207,202,.2);color:var(--v2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 &middot; 2026년 3월 &middot; 계속 업데이트 중</div>
+  </div>
+</section>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('prog').style.width = (window.scrollY / h * 100) + '%';
+    nav.classList.toggle('show', window.scrollY > 300);
+  });
+
+  function toggleStep(btn) {
+    btn.closest('.setup-step').classList.toggle('open');
+  }
+
+  function cp(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '복사됨 ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+</script>
+</body>
+</html>
