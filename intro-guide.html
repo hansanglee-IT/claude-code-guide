@@ -280,23 +280,22 @@
 
     <div class="eco-grid">
       <div class="eco-card">
-        <div class="eco-tag" style="color:var(--text-dim);">웹/앱</div>
+        <div class="eco-tag" style="color:var(--green);">비개발자 추천</div>
         <div class="eco-title">claude.ai</div>
         <div class="eco-desc">
-          브라우저에서 바로 쓰는 채팅형 AI.<br>
-          ChatGPT 웹사이트와 같은 포지션.<br><br>
-          <strong style="color:var(--white);">용도:</strong> 간단한 질문, 글쓰기, 번역<br>
-          <strong style="color:var(--white);">비유:</strong> 카카오톡으로 AI한테 물어보기
+          브라우저에서 바로 쓰는 채팅형 AI. ChatGPT와 같은 포지션.<br>
+          설치 없이 바로 시작할 수 있어 <strong style="color:var(--white);">비개발자에게 가장 적합</strong>합니다.<br><br>
+          <strong style="color:var(--white);">할 수 있는 것:</strong> 질문, 글쓰기, 번역, 문서 분석, 파일 업로드
         </div>
       </div>
       <div class="eco-card active">
         <div class="eco-tag" style="color:var(--v1);">이 가이드의 주인공</div>
         <div class="eco-title" style="color:var(--v1);">Claude Code</div>
         <div class="eco-desc">
-          컴퓨터의 파일을 읽고, 쓰고, 검색하고, 웹도 뒤지는 AI.<br>
-          채팅만 하는 게 아니라 <strong style="color:var(--white);">실제 작업을 수행</strong>.<br><br>
-          <strong style="color:var(--white);">용도:</strong> 리서치, 문서 작성, 파일 관리, 자동화<br>
-          <strong style="color:var(--white);">비유:</strong> AI 비서가 내 컴퓨터에 상주
+          내 컴퓨터의 파일을 읽고, 쓰고, 검색하고, 웹도 뒤지는 AI.<br>
+          채팅만 하는 게 아니라 <strong style="color:var(--white);">실제 작업을 수행</strong>합니다.<br><br>
+          <strong style="color:var(--white);">할 수 있는 것:</strong> 리서치, 문서 작성, 파일 자동 저장, 반복 업무 자동화<br>
+          <strong style="color:var(--v3);">단, VSCode 설치 + 초기 세팅이 필요합니다 (이 가이드가 도와줍니다)</strong>
         </div>
       </div>
       <div class="eco-card">
@@ -304,19 +303,16 @@
         <div class="eco-title">Claude API</div>
         <div class="eco-desc">
           개발자가 자기 제품에 Claude를 연결할 때 쓰는 것.<br>
-          코드로 Claude를 호출하는 방식.<br><br>
-          <strong style="color:var(--white);">용도:</strong> 앱/서비스에 AI 기능 탑재<br>
-          <strong style="color:var(--white);">비유:</strong> AI 엔진을 내 차에 장착
+          코드로 Claude를 호출하는 방식. 비개발자는 쓸 일 없습니다.<br><br>
+          <strong style="color:var(--white);">할 수 있는 것:</strong> 앱/서비스에 AI 기능 탑재
         </div>
       </div>
       <div class="eco-card">
         <div class="eco-tag" style="color:var(--text-dim);">모바일</div>
         <div class="eco-title">Claude 앱</div>
         <div class="eco-desc">
-          iOS/Android에서 쓰는 Claude.<br>
-          claude.ai의 모바일 버전.<br><br>
-          <strong style="color:var(--white);">용도:</strong> 이동 중 간단한 질문<br>
-          <strong style="color:var(--white);">비유:</strong> 주머니 속 AI 비서
+          iOS/Android에서 쓰는 Claude. claude.ai의 모바일 버전.<br><br>
+          <strong style="color:var(--white);">할 수 있는 것:</strong> 이동 중 간단한 질문, 대화
         </div>
       </div>
     </div>
@@ -411,6 +407,12 @@
             <td style="color:var(--green);">높음</td>
           </tr>
           <tr>
+            <td style="color:var(--green);font-weight:700;">claude.ai</td>
+            <td>일반 사용자</td>
+            <td>대화, 글쓰기, 문서 분석</td>
+            <td style="color:var(--green);font-weight:700;">높음</td>
+          </tr>
+          <tr>
             <td>Cursor</td>
             <td>개발자</td>
             <td>코드 작성 특화 에디터</td>
@@ -430,28 +432,38 @@
           </tr>
           <tr>
             <td style="color:var(--v1);font-weight:800;">Claude Code</td>
-            <td>개발자 + 비개발자</td>
+            <td>개발자 (비개발자도 세팅하면 가능)</td>
             <td>코드 + 문서 + 리서치 + 자동화</td>
-            <td style="color:var(--green);font-weight:700;">높음</td>
+            <td style="color:var(--v3);font-weight:700;">중간 (세팅 필요)</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">비개발자한테 Claude Code가 좋은 이유</div>
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">그러면 비개발자는 뭘 써야 하나?</div>
+
+    <div class="callout note" style="margin-bottom:16px;">
+      <span>&#9888;&#65039;</span>
+      <div>
+        <strong>솔직한 답:</strong> 단순 질문/글쓰기만 할 거면 <strong>claude.ai가 더 편합니다.</strong><br>
+        Claude Code는 초기 세팅(VSCode 설치, 터미널 사용)이 필요하기 때문에 진입장벽이 있습니다.
+      </div>
+    </div>
+
+    <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;">그럼에도 Claude Code를 세팅하는 이유</div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">1. 코드를 몰라도 됩니다</strong> &mdash; 한국어로 "시장 리서치 해줘"라고 말하면 실행됩니다. 코드를 직접 쓸 일이 없습니다.
+        <strong style="color:var(--white);">1. claude.ai는 "대화"만 합니다</strong> &mdash; Claude Code는 대화 + 파일 생성/수정 + 웹 검색 + 자동화까지. 할 수 있는 범위가 다릅니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">2. 파일을 직접 만들어줍니다</strong> &mdash; "PRD 작성해줘"라고 하면 대화 내용이 아니라 실제 파일로 저장됩니다. 복사/붙여넣기가 필요 없습니다.
+        <strong style="color:var(--white);">2. 반복 업무를 한 줄로 실행합니다</strong> &mdash; "/research 경쟁사 분석"처럼 단축 명령어를 만들 수 있습니다. claude.ai에서는 매번 처음부터 설명해야 합니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">3. 반복 업무를 자동화할 수 있습니다</strong> &mdash; Skills(단축 명령어)와 에이전트(AI 팀원)를 만들어서, 자주 하는 업무를 한 줄로 실행할 수 있습니다.
+        <strong style="color:var(--white);">3. AI 팀을 구성할 수 있습니다</strong> &mdash; 리서치팀, 법무팀, 기획팀을 만들어서 역할별로 일을 시킬 수 있습니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">4. 내 상황을 기억합니다</strong> &mdash; CLAUDE.md에 내 정보(회사, 업종, 선호 스타일)를 적어두면, 매번 설명하지 않아도 맥락을 유지합니다.
+        <strong style="color:var(--white);">4. 세팅은 한 번이면 됩니다</strong> &mdash; 이 가이드를 따라 1시간 정도 세팅하면, 이후에는 claude.ai만큼 편하게 쓸 수 있습니다.
       </div>
     </div>
   </div>
@@ -678,10 +690,8 @@
     <div class="author-name">한상</div>
     <div class="author-role">스타트업 대표이사</div>
     <div class="author-desc">
-      저도 처음엔 Claude AI랑 Claude Code가 뭐가 다른지 몰랐습니다.<br>
-      터미널이 뭔지도 몰랐고, 토큰이 뭔지도 몰랐습니다.<br><br>
-      그래서 이 0단계를 만들었습니다.<br>
-      여기 나온 것만 알면 1단계 세팅을 따라갈 수 있습니다.
+      비개발자 스타트업 대표가 Claude Code를 직접 세팅하며 만든 가이드입니다.<br>
+      써보면서 더 좋은 방법을 발견하면 계속 업데이트합니다.
     </div>
     <div style="margin-top:20px;display:inline-block;background:rgba(108,99,245,.1);border:1px solid rgba(108,99,245,.2);color:var(--v1);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 &middot; 2026년 3월</div>
   </div>
