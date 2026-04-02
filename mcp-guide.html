@@ -54,9 +54,10 @@
   }
   .hero-inner { max-width:720px; }
   .series-nav { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:28px; }
-  .series-item { font-size:11px; font-weight:600; padding:3px 10px; border-radius:4px; white-space:nowrap; }
+  .series-item { font-size:11px; font-weight:600; padding:3px 10px; border-radius:4px; white-space:nowrap; text-decoration:none; transition:all .15s; cursor:pointer; }
   .series-item.done { background:rgba(108,99,245,.15); color:var(--v1); }
-  .series-item.current { background:rgba(62,207,202,.18); color:var(--v2); border:1px solid rgba(62,207,202,.3); }
+  .series-item.done:hover { background:rgba(108,99,245,.25); }
+  .series-item.current { background:rgba(62,207,202,.18); color:var(--v2); border:1px solid rgba(62,207,202,.3); cursor:default; }
   .series-item.upcoming { background:var(--s2); color:var(--text-dim); }
   .series-arrow { color:var(--text-dim); font-size:10px; }
   .hero h1 { font-family:'Noto Serif KR',serif; font-size:clamp(28px,4vw,44px); font-weight:900; color:var(--white); line-height:1.2; margin-bottom:20px; }
@@ -134,13 +135,13 @@
 <section class="hero">
   <div class="hero-inner">
     <div class="series-nav">
-      <span class="series-item done">0단계 &middot; 개념</span>
+      <a href="intro-guide.html" class="series-item done">0단계 &middot; 개념</a>
       <span class="series-arrow">&rarr;</span>
-      <span class="series-item done">1단계 &middot; 기본 세팅</span>
+      <a href="index.html" class="series-item done">1단계 &middot; 기본 세팅</a>
       <span class="series-arrow">&rarr;</span>
-      <span class="series-item done">2단계 &middot; AI 팀 구성</span>
+      <a href="subagent-guide.html" class="series-item done">2단계 &middot; AI 팀 구성</a>
       <span class="series-arrow">&rarr;</span>
-      <span class="series-item done">3단계 &middot; 팀 협업</span>
+      <a href="agent-teams-guide.html" class="series-item done">3단계 &middot; 팀 협업</a>
       <span class="series-arrow">&rarr;</span>
       <span class="series-item current">4단계 &middot; MCP 연동</span>
     </div>
