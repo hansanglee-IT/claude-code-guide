@@ -317,7 +317,7 @@
       <div>
         <strong style="display:block;margin-bottom:4px;">시작 전 확인</strong>
         <a href="subagent-guide.html">2단계 — 서브 에이전트 설치</a>가 완료된 상태여야 합니다.<br>
-        Agent Teams는 <strong>실험적 기능</strong>입니다. 토큰 비용이 높으니 꼭 비용 섹션을 읽고 진행하세요.
+        Agent Teams는 <strong>실험적 기능</strong>입니다. 2단계(서브에이전트)와의 차이를 이해하고 진행하세요.
       </div>
     </div>
   </div>
@@ -353,9 +353,10 @@
     </div>
 
     <div style="font-size:14px;color:var(--text-mid);line-height:1.85;">
-      비유하면 이렇습니다. 2단계는 팀원들에게 하나씩 업무를 지시하고 <strong style="color:var(--white);">마이크로매니징</strong>을 해야 했다면,
-      3단계는 <strong style="color:var(--white);">중간 관리자</strong>에게 프로젝트를 던지면 팀원들에게 알아서 역할을 분배하고 서로 대화하며 일하게 됩니다.
-    </div>
+  <strong style="color:var(--white);">핵심 차이는 두 가지입니다.</strong><br><br>
+  <strong style="color:var(--white);">1. 소통 방식:</strong> 2단계는 모든 정보가 메인 세션(나)을 거쳐야 합니다. 리서치팀 결과를 내가 받아서 법무팀에 넘기는 식입니다. 3단계는 팀끼리 직접 대화합니다.<br><br>
+  <strong style="color:var(--white);">2. 토큰 효율:</strong> 2단계는 각 팀의 결과가 메인 컨텍스트에 계속 쌓입니다. 팀이 늘수록 메인이 무거워지고, 다음 팀을 부를 때 그 무거운 컨텍스트를 통째로 들고 갑니다. 3단계는 각 팀이 독립 컨텍스트를 갖고, 필요한 정보만 메시지로 교환합니다. <strong style="color:var(--v2);">팀 3개 이상이면 오히려 토큰이 절약됩니다.</strong>
+</div>
 
     <!-- 구조 다이어그램 -->
     <div class="flow-container">
@@ -571,9 +572,9 @@ CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 값을 "1"로 설정해.
               </div>
             </div>
           </div>
-          <div class="callout warn" style="margin-top:14px;">
-            <span>&#9888;&#65039;</span>
-            <div>팀 프로젝트는 팀 수만큼 비용이 곱해집니다. 단일 작업에는 쓰지 마세요.</div>
+          <div class="callout tip" style="margin-top:14px;">
+            <span>&#128161;</span>
+            <div>팀 3개 이상을 동시에 투입할 때 Agent Teams가 토큰 효율에서 유리합니다. 단일 팀 작업은 2단계(서브에이전트)가 더 빠르고 간단합니다.</div>
           </div>
         </div>
       </div>
@@ -949,11 +950,11 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
 <section class="section">
   <div class="section-inner">
     <div class="eyebrow">비용 안내</div>
-    <div class="section-h">토큰 비용 — 반드시 읽고 넘어가세요</div>
+    <div class="section-h">토큰 효율 — 2단계와 뭐가 다른가</div>
 
-    <div class="callout warn" style="margin-bottom:24px;">
-      <span>&#9888;&#65039;</span>
-      <div>Agent Teams는 각 팀원이 <strong>독립적인 Claude 인스턴스</strong>로 실행됩니다. 팀원 수만큼 토큰 비용이 곱해집니다.</div>
+    <div class="callout note" style="margin-bottom:24px;">
+      <span>&#128276;</span>
+      <div>Agent Teams는 각 팀원이 <strong>독립 컨텍스트</strong>를 갖습니다. 메인 세션에 결과가 누적되지 않아, 팀 수가 많을수록 서브에이전트 대비 토큰 효율이 좋습니다.</div>
     </div>
 
     <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
@@ -961,20 +962,20 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
         <thead>
           <tr>
             <th>방식</th>
-            <th>팀 3개 동시 실행 시</th>
-            <th>체감 비용</th>
+            <th>팀 3개 투입 시 구조</th>
+            <th>토큰 효율</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td style="color:var(--white);font-weight:600;">2단계 &middot; 서브에이전트</td>
-            <td>순차 실행 &rarr; 합산 1배</td>
-            <td style="color:var(--green);">기본</td>
+            <td>메인 컨텍스트에 결과 누적 (50K &rarr; 70K &rarr; 90K...)</td>
+            <td style="color:var(--red);">팀 많을수록 비효율</td>
           </tr>
           <tr>
             <td style="color:var(--white);font-weight:600;">3단계 &middot; Agent Teams</td>
-            <td>병렬 실행 &rarr; 동시에 3배</td>
-            <td style="color:var(--v3);">3~5배</td>
+            <td>각 팀 독립 컨텍스트 (15K + 20K + 15K)</td>
+            <td style="color:var(--green);">팀 많을수록 효율적</td>
           </tr>
         </tbody>
       </table>
@@ -984,10 +985,10 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
 
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">1. 팀원 수 제한</strong> &mdash; 한 프로젝트에 3~5개 팀이 적정. 8개 전부 동시 투입은 비용 대비 효과가 떨어집니다.
+        <strong style="color:var(--white);">1. 팀 1~2개면 2단계로</strong> &mdash; 단일 작업은 서브에이전트가 빠르고 간단합니다. Agent Teams의 효율은 팀 3개 이상부터 체감됩니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">2. 단순 작업은 2단계로</strong> &mdash; "이메일 하나 써줘"는 서브에이전트면 충분합니다. Agent Teams는 여러 팀의 결과물이 서로 영향을 줄 때만 쓰세요.
+        <strong style="color:var(--white);">2. 팀 3개 이상이면 Agent Teams</strong> &mdash; 메인 컨텍스트 누적 없이 각 팀이 독립적으로 작업하므로, 팀 수가 늘수록 효율 차이가 벌어집니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
         <strong style="color:var(--white);">3. Pro/Max 플랜 권장</strong> &mdash; API 과금이 아닌 Claude Pro($20/월) 또는 Max($100/월) 요금제를 쓰면 토큰 걱정 없이 사용 가능합니다.
@@ -1028,8 +1029,7 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
     <div class="callout note">
       <span>&#128218;</span>
       <div>
-        <strong>정리:</strong> 프로젝트 하나에 2개 팀 이상의 결과물이 서로 영향을 주면 Agent Teams.
-        독립 작업이면 서브에이전트. 대부분의 일상 업무는 서브에이전트로 충분합니다.
+        <strong>정리:</strong> 팀 1~2개 독립 작업이면 서브에이전트. 팀 3개 이상이고 결과물이 서로 영향을 주면 Agent Teams. Agent Teams는 팀 간 직접 소통 + 토큰 효율 두 가지 모두에서 유리합니다.
       </div>
     </div>
   </div>
@@ -1137,7 +1137,7 @@ IR팀: 투자자 1-pager 초안. TAM/SAM/SOM + 핵심 지표 + 투자 요청 내
       시장 리서치, 계약서 검토, 개발팀에 넘길 PRD 작성까지 — 대표가 직접 챙겨야 하는 것들을 Claude Code로 하나씩 해보고 있습니다.<br><br>
       이 가이드는 그 과정을 기록한 것입니다. 써보면서 새로 알게 된 것, 더 잘 되는 방법을 계속 업데이트할 생각입니다.
     </div>
-    <div style="margin-top:20px;display:inline-block;background:rgba(62,207,202,.1);border:1px solid rgba(62,207,202,.2);color:var(--v2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1 &middot; 2026년 3월 &middot; 계속 업데이트 중</div>
+    <div style="margin-top:20px;display:inline-block;background:rgba(62,207,202,.1);border:1px solid rgba(62,207,202,.2);color:var(--v2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1.1 &middot; 2026년 4월 &middot; 토큰 효율 정보 수정</div>
   </div>
 </section>
 
