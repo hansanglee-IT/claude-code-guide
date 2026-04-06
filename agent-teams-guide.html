@@ -352,11 +352,60 @@
       </div>
     </div>
 
-    <div style="font-size:14px;color:var(--text-mid);line-height:1.85;">
-  <strong style="color:var(--white);">핵심 차이는 두 가지입니다.</strong><br><br>
-  <strong style="color:var(--white);">1. 소통 방식:</strong> 2단계는 모든 정보가 메인 세션(나)을 거쳐야 합니다. 리서치팀 결과를 내가 받아서 법무팀에 넘기는 식입니다. 3단계는 팀끼리 직접 대화합니다.<br><br>
-  <strong style="color:var(--white);">2. 토큰 효율:</strong> 2단계는 각 팀의 결과가 메인 컨텍스트에 계속 쌓입니다. 팀이 늘수록 메인이 무거워지고, 다음 팀을 부를 때 그 무거운 컨텍스트를 통째로 들고 갑니다. 3단계는 각 팀이 독립 컨텍스트를 갖고, 필요한 정보만 메시지로 교환합니다. <strong style="color:var(--v2);">팀 3개 이상이면 오히려 토큰이 절약됩니다.</strong>
-</div>
+    <div style="font-size:14px;color:var(--text-mid);line-height:1.85;margin-bottom:24px;">
+      둘 다 "팀을 불러서 일 시키기"는 동일합니다. <strong style="color:var(--white);">차이는 팀이 일하는 방식</strong>입니다.
+    </div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--s2);">
+            <th style="padding:11px 16px;text-align:left;font-size:12px;font-weight:700;color:var(--text-dim);border-bottom:1px solid var(--border);"></th>
+            <th style="padding:11px 16px;text-align:left;font-size:12px;font-weight:700;color:var(--v1);border-bottom:1px solid var(--border);">서브에이전트 (2단계)</th>
+            <th style="padding:11px 16px;text-align:left;font-size:12px;font-weight:700;color:var(--v2);border-bottom:1px solid var(--border);">Agent Teams (3단계)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:11px 16px;font-size:13px;color:var(--white);font-weight:600;border-bottom:1px solid var(--border);">비유</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">각 팀장을 1:1로 만나서 지시하고 보고받기</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">회의실에 전원 모아놓고 알아서 토론하며 작업</td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;font-size:13px;color:var(--white);font-weight:600;border-bottom:1px solid var(--border);">팀 간 소통</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--red);border-bottom:1px solid var(--border);">불가 — 메인(나)을 거쳐야 함</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--green);border-bottom:1px solid var(--border);">직접 대화 가능</td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;font-size:13px;color:var(--white);font-weight:600;border-bottom:1px solid var(--border);">토큰 비용</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--green);border-bottom:1px solid var(--border);">낮음 — 결과 요약만 반환</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--red);border-bottom:1px solid var(--border);">높음 — 각 팀이 독립 인스턴스</td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;font-size:13px;color:var(--white);font-weight:600;border-bottom:1px solid var(--border);">내 개입</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">많음 — 결과 받고 다음 팀에 넘기기</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">적음 — 리더가 알아서 조율</td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;font-size:13px;color:var(--white);font-weight:600;border-bottom:1px solid var(--border);">결과 정합성</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">내가 직접 종합해야 함</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">팀 간 교차 검증 자동</td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;font-size:13px;color:var(--white);font-weight:600;">적합한 상황</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);">독립 작업, 빠른 단일 위임</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);">복합 프로젝트, 교차 검증 필요</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span>📌</span>
+      <div>
+        <strong>Agent Teams를 쓰는 이유는 "저렴해서"가 아닙니다.</strong> 토큰은 더 쓰지만, 팀 간 직접 소통으로 <strong style="color:var(--white);">누락을 줄이고 결과 품질을 높이는 것</strong>이 핵심입니다. 비용이 아니라 <strong style="color:var(--white);">협업 구조</strong>로 선택하세요.
+      </div>
+    </div>
 
     <!-- 구조 다이어그램 -->
     <div class="flow-container">
@@ -574,7 +623,7 @@ CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 값을 "1"로 설정해.
           </div>
           <div class="callout tip" style="margin-top:14px;">
             <span>&#128161;</span>
-            <div>팀 3개 이상을 동시에 투입할 때 Agent Teams가 토큰 효율에서 유리합니다. 단일 팀 작업은 2단계(서브에이전트)가 더 빠르고 간단합니다.</div>
+            <div>팀 간 소통이 필요한 복합 프로젝트에 적합합니다. 토큰은 더 쓰지만, 내가 중간에서 전달하는 수고와 누락이 줄어듭니다. 단일 팀 작업은 2단계(서브에이전트)가 더 빠르고 저렴합니다.</div>
           </div>
         </div>
       </div>
@@ -950,11 +999,11 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
 <section class="section">
   <div class="section-inner">
     <div class="eyebrow">비용 안내</div>
-    <div class="section-h">토큰 효율 — 2단계와 뭐가 다른가</div>
+    <div class="section-h">토큰 비용 — 알고 쓰면 괜찮습니다</div>
 
-    <div class="callout note" style="margin-bottom:24px;">
-      <span>&#128276;</span>
-      <div>Agent Teams는 각 팀원이 <strong>독립 컨텍스트</strong>를 갖습니다. 메인 세션에 결과가 누적되지 않아, 팀 수가 많을수록 서브에이전트 대비 토큰 효율이 좋습니다.</div>
+    <div class="callout warn" style="margin-bottom:24px;">
+      <span>⚠️</span>
+      <div>Agent Teams는 각 팀원이 <strong>독립된 Claude 인스턴스</strong>로 실행됩니다. 서브에이전트보다 토큰을 더 많이 씁니다. <strong style="color:var(--white);">비용이 아니라 협업 가치로 판단하세요.</strong></div>
     </div>
 
     <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
@@ -963,35 +1012,35 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
           <tr>
             <th>방식</th>
             <th>팀 3개 투입 시 구조</th>
-            <th>토큰 효율</th>
+            <th>토큰 비용</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td style="color:var(--white);font-weight:600;">2단계 &middot; 서브에이전트</td>
-            <td>메인 컨텍스트에 결과 누적 (50K &rarr; 70K &rarr; 90K...)</td>
-            <td style="color:var(--red);">팀 많을수록 비효율</td>
+            <td>각 팀이 독립 작업 &rarr; 결과를 <strong>요약</strong>해서 메인에 반환</td>
+            <td style="color:var(--green);">낮음</td>
           </tr>
           <tr>
             <td style="color:var(--white);font-weight:600;">3단계 &middot; Agent Teams</td>
-            <td>각 팀 독립 컨텍스트 (15K + 20K + 15K)</td>
-            <td style="color:var(--green);">팀 많을수록 효율적</td>
+            <td>각 팀이 독립 인스턴스 + 팀 간 메시지 교환</td>
+            <td style="color:var(--v3);">높음 (3~5배)</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div style="margin-top:20px;font-size:14px;font-weight:700;color:var(--white);margin-bottom:10px;">비용 관리 팁</div>
+    <div style="margin-top:20px;font-size:14px;font-weight:700;color:var(--white);margin-bottom:10px;">그럼에도 Agent Teams를 쓰는 이유</div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">1. 팀 1~2개면 2단계로</strong> &mdash; 단일 작업은 서브에이전트가 빠르고 간단합니다. Agent Teams의 효율은 팀 3개 이상부터 체감됩니다.
+        <strong style="color:var(--white);">1. 내가 중간에 안 끼어도 됩니다</strong> &mdash; 서브에이전트는 리서치 결과를 내가 받아서 법무팀에 넘겨야 합니다. Agent Teams는 리서치팀이 법무팀에 직접 공유합니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">2. 팀 3개 이상이면 Agent Teams</strong> &mdash; 메인 컨텍스트 누적 없이 각 팀이 독립적으로 작업하므로, 팀 수가 늘수록 효율 차이가 벌어집니다.
+        <strong style="color:var(--white);">2. 누락이 줄어듭니다</strong> &mdash; 리서치팀이 발견한 규제 이슈를 법무팀이 바로 확인하고, 개발팀에 기술 제약을 직접 전달합니다. 내가 전달하다 빠뜨릴 일이 없습니다.
       </div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-size:13.5px;color:var(--text-mid);line-height:1.75;">
-        <strong style="color:var(--white);">3. Pro/Max 플랜 권장</strong> &mdash; API 과금이 아닌 Claude Pro($20/월) 또는 Max($100/월) 요금제를 쓰면 토큰 걱정 없이 사용 가능합니다.
+        <strong style="color:var(--white);">3. Pro/Max 플랜이면 걱정 없습니다</strong> &mdash; Pro($20/월) 또는 Max($100/월) 요금제를 쓰면 토큰량이 아닌 사용량 한도 기준이라, 비용 부담이 적습니다.
       </div>
     </div>
   </div>
@@ -1029,7 +1078,7 @@ IR팀: 투자자 업데이트에 넣을 "AI 기능 도입" 슬라이드 1장 초
     <div class="callout note">
       <span>&#128218;</span>
       <div>
-        <strong>정리:</strong> 팀 1~2개 독립 작업이면 서브에이전트. 팀 3개 이상이고 결과물이 서로 영향을 주면 Agent Teams. Agent Teams는 팀 간 직접 소통 + 토큰 효율 두 가지 모두에서 유리합니다.
+        <strong>정리:</strong> 독립 작업이면 서브에이전트 — 빠르고 저렴합니다. 팀 간 소통이 필요한 복합 프로젝트면 Agent Teams — 토큰은 더 쓰지만, 내 개입 없이 팀끼리 직접 협업하고 교차 검증해서 결과 품질이 올라갑니다.
       </div>
     </div>
   </div>
@@ -1137,7 +1186,7 @@ IR팀: 투자자 1-pager 초안. TAM/SAM/SOM + 핵심 지표 + 투자 요청 내
       시장 리서치, 계약서 검토, 개발팀에 넘길 PRD 작성까지 — 대표가 직접 챙겨야 하는 것들을 Claude Code로 하나씩 해보고 있습니다.<br><br>
       이 가이드는 그 과정을 기록한 것입니다. 써보면서 새로 알게 된 것, 더 잘 되는 방법을 계속 업데이트할 생각입니다.
     </div>
-    <div style="margin-top:20px;display:inline-block;background:rgba(62,207,202,.1);border:1px solid rgba(62,207,202,.2);color:var(--v2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1.1 &middot; 2026년 4월 &middot; 토큰 효율 정보 수정</div>
+    <div style="margin-top:20px;display:inline-block;background:rgba(62,207,202,.1);border:1px solid rgba(62,207,202,.2);color:var(--v2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">v1.2 &middot; 2026년 4월 &middot; 공식 문서 기준 비용 비교 정정</div>
   </div>
 </section>
 
