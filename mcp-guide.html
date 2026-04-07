@@ -303,18 +303,26 @@
         <div class="step-toggle" onclick="toggleStep(this)">
           <div class="step-badge">3</div>
           <div class="step-toggle-title">스케줄 에이전트 등록 + Slack 전송 설정</div>
-          <div class="step-toggle-time">~5분</div>
+          <div class="step-toggle-time">~10분</div>
           <div class="step-arrow2">▶</div>
         </div>
         <div class="step-body">
-          <div class="step-desc-text">스케줄 에이전트를 만들고, 결과를 Slack으로 전송하도록 설정합니다.</div>
+          <div class="step-desc-text">스케줄 에이전트를 만들고, 결과를 Slack으로 전송하도록 설정합니다. 리모트 환경에서 MCP가 바로 연결되지 않을 수 있어서, 프롬프트에 안전장치를 넣습니다.</div>
 
           <div class="prompt-box" style="margin-bottom:16px;">
             <div class="prompt-header">
               <div class="prompt-label">VSCode의 Claude Code에 입력</div>
-              <button class="copy-btn" onclick="cp(this,'매일 오전 9시에 우리 업계 주요 뉴스와 경쟁사 동향을 리서치해서 정리해줘.\n\n포함할 내용:\n- 주요 뉴스 3개 (출처 명시)\n- 경쟁사 동향\n- 투자 소식\n- 시사점\n\n결과를 Slack #데일리-리서치 채널로 보내줘.\nSlack MCP 커넥터를 사용해서 전송해줘.\n이걸 스케줄로 등록해줘.')">복사</button>
+              <button class="copy-btn" onclick="cp(this,'매일 오전 9시에 아래 작업을 순서대로 실행하는 스케줄을 등록해줘.\n\n[STEP 0: MCP 연결 확인]\nSlack MCP 커넥터가 연결되었는지 확인해줘.\n#데일리-리서치 채널에 \"리서치 시작합니다\" 테스트 메시지를 먼저 보내줘.\n실패하면 30초 후 재시도, 최대 3회.\n\n[STEP 1: 리서치 실행]\n우리 업계 주요 뉴스와 경쟁사 동향을 리서치해서 정리해줘.\n\n포함할 내용:\n- 주요 뉴스 3개 (출처 명시)\n- 경쟁사 동향\n- 투자 소식\n- 시사점\n\n[STEP 2: Slack 전송]\n리서치 결과를 Slack #데일리-리서치 채널로 보내줘.\nSlack MCP 도구를 사용해서 전송해줘.\n도구명은 mcp__claude_ai_Slack__slack_send_message 또는 mcp__Slack__slack_send_message 중 사용 가능한 것을 써줘.\n전송 실패 시 30초 후 재시도, 최대 3회.')">복사</button>
             </div>
-            <div class="prompt-code">매일 오전 9시에 우리 업계 주요 뉴스와 경쟁사 동향을 리서치해서 정리해줘.
+            <div class="prompt-code">매일 오전 9시에 아래 작업을 순서대로 실행하는 스케줄을 등록해줘.
+
+[STEP 0: MCP 연결 확인]
+Slack MCP 커넥터가 연결되었는지 확인해줘.
+#데일리-리서치 채널에 "리서치 시작합니다" 테스트 메시지를 먼저 보내줘.
+실패하면 30초 후 재시도, 최대 3회.
+
+[STEP 1: 리서치 실행]
+우리 업계 주요 뉴스와 경쟁사 동향을 리서치해서 정리해줘.
 
 포함할 내용:
 - 주요 뉴스 3개 (출처 명시)
@@ -322,12 +330,22 @@
 - 투자 소식
 - 시사점
 
-결과를 Slack #데일리-리서치 채널로 보내줘.
-Slack MCP 커넥터를 사용해서 전송해줘.
-이걸 스케줄로 등록해줘.</div>
+[STEP 2: Slack 전송]
+리서치 결과를 Slack #데일리-리서치 채널로 보내줘.
+Slack MCP 도구를 사용해서 전송해줘.
+도구명은 mcp__claude_ai_Slack__slack_send_message 또는
+mcp__Slack__slack_send_message 중 사용 가능한 것을 써줘.
+전송 실패 시 30초 후 재시도, 최대 3회.</div>
           </div>
 
           <div class="callout tip">
+            <span>💡</span>
+            <div>
+              <strong>왜 STEP 0(테스트 메시지)이 필요한가?</strong><br>
+              리모트 환경에서 MCP 커넥터가 바로 로딩되지 않을 수 있습니다. 리서치 전에 테스트 메시지를 먼저 보내면 MCP 연결이 확보되어, 본 전송 성공률이 올라갑니다.
+            </div>
+          </div>
+          <div class="callout tip" style="margin-top:8px;">
             <span>💡</span>
             <div>
               <strong>채널명을 정확히 입력하세요.</strong> Claude가 자동으로 채널을 찾아서 연결합니다.<br>
@@ -425,18 +443,23 @@ Slack MCP 커넥터를 사용해서 전송해줘.
           <tbody>
             <tr>
               <td style="padding:11px 16px;font-size:13px;color:var(--white);border-bottom:1px solid var(--border);">"도구를 찾을 수 없음"</td>
-              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">도구 이름 불일치</td>
-              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">스케줄 삭제 후 재등록. Claude가 자동으로 올바른 도구명 매핑</td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">도구 이름 불일치<br><span style="font-size:11px;color:var(--text-dim);">(로컬과 리모트에서 이름이 다름)</span></td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">프롬프트에 도구명 두 가지 변형 모두 포함.<br>트리거의 permitted_tools, allowed_tools도 확인</td>
             </tr>
             <tr>
               <td style="padding:11px 16px;font-size:13px;color:var(--white);border-bottom:1px solid var(--border);">로컬에서는 되는데<br>스케줄에서 안 됨</td>
               <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">커넥터 권한이<br>"승인 필요" 상태</td>
-              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">claude.ai/settings/connectors<br>&rarr; "항상 허용"으로 변경</td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">claude.ai/settings/connectors<br>&rarr; "항상 허용"으로 변경 (STEP 2)</td>
             </tr>
             <tr>
-              <td style="padding:11px 16px;font-size:13px;color:var(--white);">되다가 안 되다가 반복</td>
-              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);">MCP 커넥터 지연 로딩</td>
-              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);">스케줄 삭제 후 재등록.<br>프롬프트에 "Slack 전송이 안 되면 30초 후 재시도" 추가</td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--white);border-bottom:1px solid var(--border);">되다가 안 되다가 반복</td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">MCP 지연 로딩<br><span style="font-size:11px;color:var(--text-dim);">(알려진 플랫폼 버그)</span></td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);border-bottom:1px solid var(--border);">프롬프트에 STEP 0(테스트 메시지) 포함 +<br>전송 실패 시 30초 간격 3회 재시도</td>
+            </tr>
+            <tr>
+              <td style="padding:11px 16px;font-size:13px;color:var(--white);">curl/Webhook도 안 됨</td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);">리모트 환경에서<br>아웃바운드 차단</td>
+              <td style="padding:11px 16px;font-size:13px;color:var(--text-mid);">MCP 커넥터가 유일한 전송 수단.<br>재시도 로직으로 대응</td>
             </tr>
           </tbody>
         </table>
@@ -447,6 +470,15 @@ Slack MCP 커넥터를 사용해서 전송해줘.
         <div>
           <strong>대부분의 실패는 STEP 2(권한 설정)를 빠뜨려서 발생합니다.</strong><br>
           스케줄 에이전트는 무인 환경에서 실행되기 때문에, "항상 허용"이 아니면 승인 대기 상태에서 타임아웃으로 실패합니다.
+        </div>
+      </div>
+
+      <div class="callout warn" style="margin-top:12px;">
+        <span>⚠️</span>
+        <div>
+          <strong>알려진 제약: MCP 지연 로딩</strong><br>
+          스케줄 에이전트에서 MCP 커넥터가 간헐적으로 연결 지연되는 현상이 보고되고 있습니다. 같은 설정인데 성공/실패가 반복될 수 있습니다.<br><br>
+          이 가이드의 프롬프트에 포함된 <strong style="color:var(--white);">STEP 0(테스트 메시지) + 재시도 로직</strong>으로 대응 가능하며, Anthropic이 플랫폼 업데이트로 해결할 예정입니다.
         </div>
       </div>
     </div>
