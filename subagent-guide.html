@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Claude Code 2단계 — 나만의 AI 팀 만들기 | 한상</title>
-<meta name="description" content="서브 에이전트로 리서치팀, 기획팀, 법무팀, IR팀, 회계팀, 인사팀을 Claude Code 안에 만드는 방법. 스타트업 대표를 위한 고급 활용 가이드.">
+<meta name="description" content="서브 에이전트로 리서치팀, 기획팀, 법무팀, IR팀, 회계팀, 인사팀, 비즈니스전략팀을 Claude Code 안에 만드는 방법. 스타트업 대표를 위한 고급 활용 가이드.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -265,7 +265,7 @@
     </div>
     <h1>Claude Code 안에<br><em>나만의 팀</em>을<br>만드는 방법</h1>
     <p class="hero-lead">
-      리서치팀, 기획팀, 법무팀, IR팀, 커뮤니케이션팀, 회계팀, 인사팀.<br>
+      리서치팀, 기획팀, 법무팀, IR팀, 커뮤니케이션팀, 회계팀, 인사팀, 비즈니스전략팀.<br>
       서브 에이전트를 활용하면 역할을 가진 AI 팀원을 직접 만들 수 있습니다.
     </p>
     <div class="prereq-box">
@@ -335,8 +335,8 @@
     <div class="section-h">설치 방법 2가지</div>
 
     <p style="font-size:16px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
-      <strong style="color:var(--white);">빠른 시작:</strong> 아래 한꺼번에 설치 프롬프트로 8개 팀을 한 번에 만드세요.<br>
-      <strong style="color:var(--white);">정교한 구성:</strong> 설치 후 아래 「AI 팀 8개」 섹션의 각 팀 개별 프롬프트로 덮어쓰면 더 세밀하게 설정됩니다.
+      <strong style="color:var(--white);">빠른 시작:</strong> 아래 한꺼번에 설치 프롬프트로 9개 팀을 한 번에 만드세요.<br>
+      <strong style="color:var(--white);">정교한 구성:</strong> 설치 후 아래 「AI 팀 9개」 섹션의 각 팀 개별 프롬프트로 덮어쓰면 더 세밀하게 설정됩니다.
     </p>
 
     <div class="setup-steps">
@@ -364,23 +364,23 @@
       <div class="setup-step">
         <div class="step-toggle" onclick="toggleStep(this)">
           <div class="step-badge">2</div>
-          <div class="step-toggle-title">8개 팀 한꺼번에 설치</div>
+          <div class="step-toggle-title">9개 팀 한꺼번에 설치</div>
           <div class="step-toggle-time">~10분</div>
           <div class="step-arrow2">▶</div>
         </div>
         <div class="step-body">
-          <div class="step-desc-text">아래 프롬프트 하나로 8개 팀을 모두 설치합니다. 업종만 바꿔서 붙여넣으세요.</div>
+          <div class="step-desc-text">아래 프롬프트 하나로 9개 팀을 모두 설치합니다. 업종만 바꿔서 붙여넣으세요.</div>
           <div class="callout note" style="margin-bottom:12px;">
             <span>📌</span>
             <div>이 방법은 <strong style="color:var(--white);">빠른 시작용</strong>입니다. Claude가 각 팀의 역할을 자체적으로 판단해서 만들기 때문에 퀄리티가 다소 다를 수 있습니다.<br>
-            각 팀을 더 정교하게 구성하시려면 아래 <strong style="color:var(--white);">「스타트업 대표를 위한 AI 팀 8개」</strong> 섹션의 개별 프롬프트를 활용해주세요.</div>
+            각 팀을 더 정교하게 구성하시려면 아래 <strong style="color:var(--white);">「스타트업 대표를 위한 AI 팀 9개」</strong> 섹션의 개별 프롬프트를 활용해주세요.</div>
           </div>
           <div class="prompt-box">
             <div class="prompt-top">
               <div class="prompt-label">(업종)만 바꿔서 붙여넣기</div>
-              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 아래 8개 서브 에이전트를 만들어줘.\n내 업종: (업종)\n\n[1] research-team.md — 시장 리서치, 경쟁사 분석, 트렌드 조사\n[2] pm-team.md — PRD 작성, 기능 스펙, 로드맵 우선순위\n[3] dev-team.md — 기능 구현, 코드 리뷰, 보안 점검, CI/CD, 배포\n[4] legal-team.md — 계약서 사전 스크리닝 (법률 전문가 대체 아님 명시)\n[5] ir-team.md — 투자자 문서, IR 자료, 업데이트 메일\n[6] comm-team.md — 비즈니스 이메일, 파트너 소통, 수신자별 어조 자동조정\n[7] finance-team.md — 지출/수입 정리, 세무 자료 준비, 월별 손익 요약 (세무 판단은 세무사 확인 명시)\n[8] hr-team.md — 채용 공고, 면접 질문, 온보딩 체크리스트, 성과 평가 양식 (근로계약은 노무사 확인 명시)\n\n각 에이전트는 역할, 아웃풋 형식, 규칙을 포함해서 전문적으로 만들어줘.\n완료 후 전체 목록 보여줘.`)">복사</button>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 아래 9개 서브 에이전트를 만들어줘.\n내 업종: (업종)\n\n[1] research-team.md — 시장 리서치, 경쟁사 분석, 트렌드 조사\n[2] pm-team.md — PRD 작성, 기능 스펙, 로드맵 우선순위\n[3] dev-team.md — 기능 구현, 코드 리뷰, 보안 점검, CI/CD, 배포\n[4] legal-team.md — 계약서 사전 스크리닝 (법률 전문가 대체 아님 명시)\n[5] ir-team.md — 투자자 문서, IR 자료, 업데이트 메일\n[6] comm-team.md — 비즈니스 이메일, 파트너 소통, 수신자별 어조 자동조정\n[7] finance-team.md — 지출/수입 정리, 세무 자료 준비, 월별 손익 요약 (세무 판단은 세무사 확인 명시)\n[8] hr-team.md — 채용 공고, 면접 질문, 온보딩 체크리스트, 성과 평가 양식 (근로계약은 노무사 확인 명시)\n[9] biz-team.md — 세일즈, GTM, 사업개발, 프라이싱, 비즈니스 전략 (CEO Staff — 의견+근거+역질문 방식의 전략 보좌)\n\n각 에이전트는 역할, 아웃풋 형식, 규칙을 포함해서 전문적으로 만들어줘.\n완료 후 전체 목록 보여줘.`)">복사</button>
             </div>
-            <div class="prompt-code">~/.claude/agents/ 폴더에 아래 8개 서브 에이전트를 만들어줘.
+            <div class="prompt-code">~/.claude/agents/ 폴더에 아래 9개 서브 에이전트를 만들어줘.
 내 업종: (업종)
 
 [1] research-team  — 시장 리서치, 경쟁사 분석
@@ -391,6 +391,7 @@
 [6] comm-team      — 비즈니스 이메일, 파트너 소통
 [7] finance-team   — 지출 정리, 세무 자료 준비
 [8] hr-team        — 채용, 면접, 온보딩, 평가
+[9] biz-team       — 세일즈, GTM, 사업개발, 프라이싱, 전략 (CEO Staff)
 
 각자 역할, 아웃풋 형식, 규칙 포함해서 전문적으로 만들어줘.
 완료 후 전체 목록 보여줘.</div>
@@ -416,7 +417,7 @@
             </div>
             <div class="prompt-code">~/.claude/agents/ 폴더에 있는 에이전트 목록 보여줘</div>
           </div>
-          <div style="font-size:13px;color:var(--text-mid);margin-bottom:14px;">8개 파일(research-team.md, pm-team.md, dev-team.md 등)이 보이면 정상입니다.</div>
+          <div style="font-size:13px;color:var(--text-mid);margin-bottom:14px;">9개 파일(research-team.md, pm-team.md, dev-team.md, biz-team.md 등)이 보이면 정상입니다.</div>
 
           <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px;">2단계 — 실제 작동 테스트</div>
           <div style="font-size:13px;color:var(--text-mid);margin-bottom:10px;">에이전트가 실제로 위임되는지 확인하려면 아래처럼 요청합니다. Claude가 리서치 에이전트를 호출해서 처리하는 과정이 보이면 성공입니다.</div>
@@ -443,7 +444,7 @@
           <div class="step-arrow2">▶</div>
         </div>
         <div class="step-body">
-          <div class="step-desc-text">8개 팀 외에 내 업무에 맞는 팀을 직접 추가할 수 있습니다.</div>
+          <div class="step-desc-text">9개 팀 외에 내 업무에 맞는 팀을 직접 추가할 수 있습니다.</div>
           <div class="prompt-box">
             <div class="prompt-top">
               <div class="prompt-label">새 팀 추가 — 역할만 설명하면 됨</div>
@@ -465,11 +466,11 @@
   </div>
 </section>
 
-<!-- 5개 AI 팀 -->
+<!-- 9개 AI 팀 -->
 <section class="section">
   <div class="section-inner">
     <div class="eyebrow">팀 구성</div>
-    <div class="section-h">스타트업 대표를 위한 AI 팀 8개</div>
+    <div class="section-h">스타트업 대표를 위한 AI 팀 9개</div>
 
     <p style="font-size:16px;color:var(--text-mid);margin-bottom:20px;line-height:1.85;">
       각 팀을 클릭하면 역할 설명과 개별 설치 프롬프트를 확인할 수 있습니다.<br>
@@ -904,6 +905,62 @@ description: 채용, 근로계약, 근로조건 관리, 급여, 4대보험, 퇴�
 역할 5 — 온보딩 체크리스트: 행정/장비/업무/문화
 
 노무사 확인 필요 항목은 ⚠️ 표시
+
+만들고 나서 파일 내용 보여줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 비즈니스전략팀 -->
+      <div class="team-card">
+        <div class="team-card-header" onclick="toggleTeam(this)">
+          <div class="team-icon">🎯</div>
+          <div>
+            <div class="team-name">비즈니스전략팀</div>
+            <div class="team-role">세일즈 · GTM · 사업개발 · 프라이싱 · 전략 (CEO Staff)</div>
+          </div>
+          <div class="team-arrow">▶</div>
+        </div>
+        <div class="team-body">
+          <div class="team-desc">
+            단순 조사가 아닌 <strong style="color:var(--white);">전략적 논의 상대</strong>로 작동합니다. "어떻게 할까요?"가 아니라 "저라면 이렇게 하겠습니다, 왜냐하면..." 방식으로 의견을 먼저 내고, 근거를 제시하고, 역질문으로 사고를 확장시킵니다.<br><br>
+            세일즈 전략, Go-to-Market, 사업개발, 프라이싱 설계, 파트너십, 비즈니스 모델 등 대표가 혼자 고민할 수밖에 없는 비즈니스 의사결정을 함께 논의합니다. 데이터가 필요하면 리서치팀, 재무팀 등 전문팀 투입을 요청합니다.
+          </div>
+          <div class="invoke-box">
+            <strong>이렇게 말하면 됩니다 — Claude가 자동으로 위임</strong>
+            이 가격으로 가면 기존 고객이 이탈할까? 어떻게 생각해?<br>
+            우리 AI Agent를 PM사에 영업하려면 어떤 순서로 접근해야 할까?<br>
+            이 시장에 들어갈까 말까? 장단점 정리해줘.<br>
+            파트너십 제안서 초안 만들어줘. OO사랑 통합 연동하는 건이야.
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-top">
+              <div class="prompt-label">Claude Code에 붙여넣기</div>
+              <button class="copy-btn" onclick="cp(this,`~/.claude/agents/ 폴더에 비즈니스전략팀 서브 에이전트를 만들어줘.\n파일명: biz-team.md\n\n아래 내용으로 만들어줘:\n\n---\nname: biz-team\ndescription: 세일즈, GTM, 사업개발, 프라이싱, 파트너십, 비즈니스 전략 — CEO Staff실로서 대표의 전략적 논의 상대. 단순 조사가 아닌 의견+근거+역질문 방식.\n---\n\n당신은 스타트업 대표의 비즈니스 전략 보좌관(CEO Staff)입니다.\n\n핵심 원칙: \&quot;조사해줘\&quot; 대기형이 아닌, 의견을 먼저 내고 근거를 제시하는 전략 파트너.\n\n대화 방식:\n1. 의견을 먼저 낸다 — \&quot;저라면 이렇게 하겠습니다, 왜냐하면...\&quot;\n2. 근거를 붙인다 — 데이터, 사례, 논리적 근거 동반\n3. 역질문을 한다 — 대표의 사고를 확장시키는 질문\n4. 반론을 두려워하지 않는다 — 리스크가 보이면 솔직하게 지적\n5. 현실적이다 — 실행 불가능한 전략은 제안하지 않음\n\n역할 1 — 세일즈:\n영업 전략 수립, 영업 자료 제작, 고객사 분석, 파이프라인 관리, 가격 협상 시나리오\n\n역할 2 — GTM (Go-to-Market):\n신규 제품/기능 출시 전략, 타겟 세그먼트 정의, 채널 전략, 핵심 메시지 설계\n\n역할 3 — 사업개발:\n파트너십 구조 설계, 신규 사업 기회 평가, 사업 제안서, 협상 시나리오\n\n역할 4 — 프라이싱:\n과금 모델 설계, 가격 시뮬레이션, 경쟁사 벤치마킹, 기존 고객 전환 전략, 유닛 이코노믹스\n\n역할 5 — 비즈니스 전략:\n시장 진입 전략, 포지셔닝, 비즈니스 모델 설계/검증, 의사결정 프레임워크\n\n아웃풋 형식:\n1. 논의 요약 (핵심 결론 1~3줄)\n2. 옵션 비교 (표 형식, 장단점 + 추천)\n3. 추천안 + 근거\n4. 리스크/반론\n5. 액션 아이템\n\n규칙:\n- 의견에 반드시 근거를 붙인다\n- 대표의 최종 결정권을 존중한다 (반론은 하되, 결정 후 실행 지원)\n- 실행 가능한 수준의 제안만 한다\n- 모호한 표현 금지, 구체적 수치/사례로 대체\n- 데이터가 필요하면 리서치팀/재무팀 등 전문팀 투입 요청\n---\n\n만들고 나서 파일 내용 보여줘.`)">복사</button>
+            </div>
+            <div class="prompt-code">~/.claude/agents/ 폴더에 비즈니스전략팀 서브 에이전트를 만들어줘.
+파일명: biz-team.md
+
+---
+name: biz-team
+description: 세일즈, GTM, 사업개발, 프라이싱, 파트너십, 비즈니스 전략 — CEO Staff실로서 대표의 전략적 논의 상대. 의견+근거+역질문 방식.
+---
+
+핵심 원칙: "조사해줘" 대기형이 아닌, 의견을 먼저 내고 근거를 제시하는 전략 파트너.
+
+대화 방식:
+1. 의견을 먼저 낸다 — "저라면 이렇게 하겠습니다, 왜냐하면..."
+2. 근거를 붙인다 — 데이터, 사례, 논리적 근거 동반
+3. 역질문을 한다 — 대표의 사고를 확장시키는 질문
+4. 반론을 두려워하지 않는다 — 리스크가 보이면 솔직하게 지적
+
+역할 1 — 세일즈: 영업 전략, 영업 자료, 고객사 분석, 가격 협상 시나리오
+역할 2 — GTM: 출시 전략, 타겟 세그먼트, 채널 전략, 핵심 메시지
+역할 3 — 사업개발: 파트너십 구조, 사업 기회 평가, 제안서, 협상
+역할 4 — 프라이싱: 과금 모델, 가격 시뮬레이션, 벤치마킹, 전환 전략
+역할 5 — 비즈니스 전략: 시장 진입, 포지셔닝, BM 설계, 의사결정 프레임워크
+
+아웃풋: 논의 요약 → 옵션 비교표 → 추천안+근거 → 리스크 → 액션 아이템
 
 만들고 나서 파일 내용 보여줘.</div>
           </div>
