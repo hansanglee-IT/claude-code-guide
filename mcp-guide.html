@@ -283,8 +283,10 @@
           <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:16px;">
             <div style="font-size:13px;color:var(--text-mid);line-height:1.85;">
               <strong style="color:var(--white);">Step 1.</strong> <strong style="color:var(--v2);">claude.ai/settings/connectors</strong> &rarr; Slack 클릭<br>
-              <strong style="color:var(--white);">Step 2.</strong> "대화형 도구" 항목에서 <strong style="color:var(--white);">"항상 허용"</strong>으로 변경<br>
-              <strong style="color:var(--white);">Step 3.</strong> 저장
+              <strong style="color:var(--white);">Step 2.</strong> <strong style="color:var(--v3);">"대화형 도구"</strong> &rarr; <strong style="color:var(--white);">"항상 허용"</strong>으로 변경<br>
+              <strong style="color:var(--white);">Step 3.</strong> <strong style="color:var(--v3);">"쓰기/삭제 도구"</strong> &rarr; <strong style="color:var(--white);">"항상 허용"</strong>으로 변경 <strong style="color:var(--red);">(필수!)</strong><br>
+              <strong style="color:var(--white);">Step 4.</strong> "읽기 전용 도구"도 <strong style="color:var(--white);">"항상 허용"</strong> 확인<br>
+              <strong style="color:var(--white);">Step 5.</strong> 저장
             </div>
           </div>
 
@@ -292,6 +294,8 @@
             <span>⚠️</span>
             <div>
               <strong>"승인 필요"로 되어 있으면 스케줄이 실패합니다.</strong><br>
+              특히 <strong style="color:var(--red);">"쓰기/삭제 도구"</strong>에 메시지 보내기가 포함되어 있습니다. 이 항목을 놓치면 메시지 전송이 차단됩니다.<br>
+              <strong>대화형, 쓰기/삭제, 읽기 전용 — 3개 카테고리 모두 "항상 허용"</strong>으로 설정하세요.<br>
               비유하면 무인 매장에 "직원 승인 필요" 결제 시스템을 달아놓은 격입니다. 직원(나)이 없으니 결제(전송)가 안 됩니다.
             </div>
           </div>
