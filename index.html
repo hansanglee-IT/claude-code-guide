@@ -1297,13 +1297,68 @@
   </div>
 </section>
 
-<!-- ─── PLAN MODE ─── -->
+<!-- ─── PERMISSION MODES ─── -->
 <section class="section" id="planmode">
   <div class="section-inner">
-    <div class="eyebrow">추천 설정</div>
-    <div class="section-h">플랜 모드를 기본값으로 쓰는 걸 추천합니다</div>
+    <div class="eyebrow">Permission Modes</div>
+    <div class="section-h">4가지 모드 — 언제 무엇을 쓸까</div>
 
     <p style="font-size:16px;color:var(--text-mid);margin-bottom:28px;line-height:1.85;">
+      Claude Code는 작업을 실행하는 방식을 4가지 모드로 나눠서 제공합니다.<br>
+      입력창에서 <code style="font-family:monospace;background:var(--s2);padding:1px 6px;border-radius:3px;color:var(--v2);">Shift + Tab</code> 을 누를 때마다 순차적으로 전환됩니다.
+    </p>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px;">
+      <div style="padding:18px 24px;border-bottom:1px solid var(--border);">
+        <div style="font-size:16px;font-weight:800;color:var(--white);margin-bottom:4px;">모드별 비교</div>
+        <div style="font-size:13px;color:var(--text-dim);">Shift + Tab 으로 순환 전환 · 현재 모드는 입력창 하단에 표시</div>
+      </div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(108,99,245,.15);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">✋</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:3px;">Ask before edits <span style="font-size:12px;color:var(--text-dim);font-weight:500;">· 기본값</span></div>
+            <div style="font-size:13.5px;color:var(--text-mid);line-height:1.7;">파일 수정·명령 실행 전에 매번 승인을 물어봅니다. 중요한 파일이나 프로덕션 코드를 다룰 때, 실수 방지가 최우선일 때 적합합니다.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(62,207,202,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">⚡</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:3px;">Edit automatically</div>
+            <div style="font-size:13.5px;color:var(--text-mid);line-height:1.7;">선택한 텍스트나 파일 전체를 승인 없이 바로 수정합니다. 반복적 리팩터링, 대량 편집, 결과 검증이 쉬운 작업에 적합합니다.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(245,166,35,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📜</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:3px;">Plan mode <span style="font-size:12px;color:var(--green);font-weight:600;">· 처음 쓸 때 권장</span></div>
+            <div style="font-size:13.5px;color:var(--text-mid);line-height:1.7;">실행하기 전에 계획을 먼저 보여주고, 승인하면 실행합니다. 큰 변경 전 구조 파악, 설계 검토, 범위 합의에 적합합니다. 아래에서 자세히 설명합니다.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(62,207,142,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🤖</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:3px;">Auto mode</div>
+            <div style="font-size:13.5px;color:var(--text-mid);line-height:1.7;">작업 성격에 따라 Claude가 위 3가지 모드 중 적절한 것을 자동으로 선택합니다. 편리하지만, 작동 확인된 흐름을 자동 판단에 맡기는 게 부담이라면 권장하지 않습니다.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="background:var(--s2);border-radius:10px;padding:16px 20px;margin-bottom:28px;border-left:3px solid var(--v2);">
+      <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:6px;">한 줄 요약</div>
+      <div style="font-size:13.5px;color:var(--text-mid);line-height:1.75;">
+        처음이라면 <strong style="color:var(--white);">Plan mode</strong>, 익숙해지면 <strong style="color:var(--white);">Ask before edits</strong>, 단순·반복 작업일 때만 <strong style="color:var(--white);">Edit automatically</strong>. Auto mode는 충분히 능숙해진 뒤에 고려하세요.
+      </div>
+    </div>
+
+    <div style="font-size:20px;font-weight:800;color:var(--white);margin-bottom:8px;">권장 기본값 — Plan Mode</div>
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:24px;line-height:1.8;">
       플랜 모드란 Claude Code가 작업을 실행하기 <strong style="color:var(--white);">전에</strong> 먼저 계획을 보여주고, 승인하면 실행하는 방식입니다.<br>
       처음 Claude Code를 쓰는 분이라면 기본값으로 켜두는 걸 권장합니다.
     </p>
